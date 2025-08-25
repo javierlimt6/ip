@@ -11,8 +11,9 @@ public class Friday {
     }
 
     private static void listen() {
-        Scanner in = new Scanner(System.in);
-        while (true) {
+    Scanner in = new Scanner(System.in);
+    listenLoop:
+    while (true) {
             String line = in.nextLine().trim();
             // split command + rest
             String cmd;
@@ -28,40 +29,48 @@ public class Friday {
 
             // top separator for response
             indent();
-
-            if ("bye".equals(cmd)) {
-                bye();
-                break;
-            } else if ("list".equals(cmd)) {
-                list();
-            } else if ("mark".equals(cmd)) {
-                int idx = parseIndexFromString(rest);
-                mark(idx);
-            } else if ("unmark".equals(cmd)) {
-                int idx = parseIndexFromString(rest);
-                unmark(idx);
-            } else if ("todo".equals(cmd)) {
-                addTodo(rest);
-            } else if ("deadline".equals(cmd)) {
-                addDeadline(rest);
-            } else if ("event".equals(cmd)) {
-                addEvent(rest);
-            } else if (!cmd.isBlank()) {
-                // unknown command: treat entire line as a todo (backwards-compatible)
-                addTodo(line);
-            } else {
-                // empty input -> show nothing (just closing separator already printed)
+            try {
+                if (cmd.isBlank()) {
+                    // Just ignore blank lines (no extra separator needed already printed)
+                    indent();
+                    continue;
+                }
+                switch (cmd) {
+                    case "bye":
+                        bye();
+                        break listenLoop;
+                    case "list":
+                        list();
+                        break;
+                    case "mark":
+                        mark(requireIndex(rest));
+                        break;
+                    case "unmark":
+                        unmark(requireIndex(rest));
+                        break;
+                    case "todo":
+                        addTodo(rest);
+                        break;
+                    case "deadline":
+                        addDeadline(rest);
+                        break;
+                    case "event":
+                        addEvent(rest);
+                        break;
+                    default:
+                        throw new FridayException(" I don't recognise that command. Try: todo, deadline, event, list, mark, unmark, bye");
+                }
+            } catch (FridayException e) {
+                System.out.println(e.getMessage());
                 indent();
             }
         }
         in.close();
     }
 
-    private static void addTodo(String desc) {
+    private static void addTodo(String desc) throws FridayException {
         if (desc == null || desc.isBlank()) {
-            System.out.println(" Please provide a description for the todo.");
-            indent();
-            return;
+            throw new FridayException(" A todo needs a description.");
         }
         tasks[memPointer++] = new ToDo(desc);
         System.out.println(" Got it. I've added this task:");
@@ -70,11 +79,9 @@ public class Friday {
         indent();
     }
 
-    private static void addDeadline(String rest) {
+    private static void addDeadline(String rest) throws FridayException {
         if (rest == null || rest.isBlank()) {
-            System.out.println(" Please provide a description for the deadline.");
-            indent();
-            return;
+            throw new FridayException(" A deadline needs a description.");
         }
         int byIdx = rest.indexOf("/by");
         String desc;
@@ -92,11 +99,9 @@ public class Friday {
         indent();
     }
 
-    private static void addEvent(String rest) {
+    private static void addEvent(String rest) throws FridayException {
         if (rest == null || rest.isBlank()) {
-            System.out.println(" Please provide a description for the event.");
-            indent();
-            return;
+            throw new FridayException(" An event needs a description.");
         }
         int fromIdx = rest.indexOf("/from");
         int toIdx = rest.indexOf("/to");
@@ -133,7 +138,7 @@ public class Friday {
             System.out.println(" Nice! I've marked this task as done:");
             System.out.println("   " + tasks[idx - 1].display());
         } else {
-            System.out.println(" Invalid task number.");
+            System.out.println(" That task number doesn't exist.");
         }
         indent();
     }
@@ -144,7 +149,7 @@ public class Friday {
             System.out.println(" OK, I've marked this task as not done yet:");
             System.out.println("   " + tasks[idx - 1].display());
         } else {
-            System.out.println(" Invalid task number.");
+            System.out.println(" That task number doesn't exist.");
         }
         indent();
     }
@@ -180,5 +185,11 @@ public class Friday {
         } catch (NumberFormatException e) {
             return -1;
         }
+    }
+
+    private static int requireIndex(String s) throws FridayException {
+        int idx = parseIndexFromString(s);
+        if (idx < 1) throw new FridayException(" Provide a valid task number.");
+        return idx;
     }
 }
