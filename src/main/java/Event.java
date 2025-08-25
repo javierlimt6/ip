@@ -1,9 +1,14 @@
-class Event extends Task {
-    String from;
-    String to;
-    Event(String desc, String from, String to) { super(desc); this.from = from; this.to = to; }
-    @Override String typeLetter() { return "E"; }
-    @Override String display() {
+public class Event extends Task {
+    private String from;
+    private String to;
+    public Event(String desc, String from, String to) {
+        super(desc);
+        this.from = from;
+        this.to = to;
+    }
+    @Override public TaskType getType() { return TaskType.EVENT; }
+
+    @Override public String display() {
         String base = super.display();
         String details = "";
         if (from != null && !from.isBlank()) {

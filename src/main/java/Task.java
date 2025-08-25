@@ -1,16 +1,20 @@
-abstract class Task {
-    boolean done;
-    String desc;
+public abstract class Task {
+    private boolean done;
+    public String desc;
 
-    Task(String desc) { this.desc = desc; }
+    public Task(String desc) {
+        this.desc = desc;
+    }
 
-    void markDone() { done = true; }
+    public void markDone() { done = true; }
+    public void markUndone() { done = false; }
 
-    void markUndone() { done = false; }
+    // refactored to use enum
+    public abstract TaskType getType();
 
-    abstract String typeLetter();
+    public String statusBox() { return "[" + (done ? "X" : " ") + "]"; }
 
-    String statusBox() { return "[" + (done ? "X" : " ") + "]"; }
-
-    String display() { return "[" + typeLetter() + "]" + statusBox() + " " + desc; }
+    public String display() {
+        return "[" + getType().shortName() + "]" + statusBox() + " " + desc;
+    }
 }
