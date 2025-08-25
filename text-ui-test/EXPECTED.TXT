@@ -45,6 +45,20 @@ ____________________________________________________________
  5.[E][ ] prepare slides (to: 11/10/2019)
 ____________________________________________________________
 ____________________________________________________________
+ Noted. I've removed this task:
+   [E][ ] project meeting (from: Mon 2pm to: 4pm)
+ Now you have 4 tasks in the list.
+____________________________________________________________
+ I don't recognise that command. Try: todo, deadline, event, list, mark, unmark, bye
+____________________________________________________________
+____________________________________________________________
+ Here are the tasks in your list:
+ 1.[T][ ] borrow book
+ 2.[D][ ] return book (by: Sunday)
+ 3.[E][ ] orientation week (from: 4/10/2019)
+ 4.[E][ ] prepare slides (to: 11/10/2019)
+____________________________________________________________
+____________________________________________________________
  Nice! I've marked this task as done:
    [D][X] return book (by: Sunday)
 ____________________________________________________________

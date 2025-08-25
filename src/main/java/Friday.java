@@ -54,6 +54,8 @@ public class Friday {
                     case "event":
                         addEvent(rest);
                         break;
+                    case "delete":
+                        delete(requireIndex(rest));
                     default:
                         throw new FridayException(" I don't recognise that command. Try: todo, deadline, event, list, mark, unmark, bye");
                 }
@@ -93,6 +95,18 @@ public class Friday {
         System.out.println(" Got it. I've added this task:");
         System.out.println("   " + tasks.get(tasks.size() - 1).display());
         System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        indent();
+    }
+
+    private static void delete(int idx) throws FridayException {
+        if (idx >= 1 && idx <= tasks.size()) {
+            Task t = tasks.remove(idx - 1);
+            System.out.println(" Noted. I've removed this task:");
+            System.out.println("   " + t.display());
+            System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        } else {
+            System.out.println(" That task number doesn't exist.");
+        }
         indent();
     }
 
