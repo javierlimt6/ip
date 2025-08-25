@@ -6,7 +6,7 @@ public class Friday {
     public static void main(String[] args) {
 
         greet();
-        bye();
+        listen();
     }
 
     private static void indent() {
@@ -22,6 +22,7 @@ public class Friday {
 
     private static void bye() {
         System.out.println("Bye. Hope to see you again soon!");
+        indent();
     }
 
     private static void listen() {
@@ -30,10 +31,10 @@ public class Friday {
             String line = in.nextLine().trim();
             indent();
             if ("bye".equals(line)) {
-                System.out.println(" Bye. Hope to see you again soon!");
-                indent();
+                bye();
                 break;
             } else {
+                // currently only echoes
                 System.out.println(" " + line);
                 indent();
             }
