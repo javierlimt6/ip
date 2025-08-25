@@ -2,6 +2,8 @@ import java.util.Scanner;
 
 public class Friday {
     private static final String IND = "____________________________________________________________";
+    private static String[] memory = new String[100]; 
+    private static int memPointer = 0;
 
     public static void main(String[] args) {
 
@@ -34,8 +36,10 @@ public class Friday {
                 bye();
                 break;
             } else {
-                // currently only echoes
-                System.out.println(" " + line);
+                // currently adds text to memory
+                memory[memPointer] = line;
+                memPointer++;
+                System.out.println("added: " + line);
                 indent();
             }
         }
