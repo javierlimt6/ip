@@ -1,3 +1,16 @@
+todo
 todo borrow book
-list
+deadline
 deadline return book /by Sunday
+event
+event project meeting /from Mon 2pm /to 4pm
+event orientation week /from 4/10/2019
+event prepare slides /to 11/10/2019
+list
+mark 2
+unmark 2
+mark 50
+unmark 0
+blah
+
+bye

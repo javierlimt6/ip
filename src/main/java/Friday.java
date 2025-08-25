@@ -1,9 +1,9 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Friday {
     private static final String IND = "____________________________________________________________";
-    private static final Task[] tasks = new Task[100];
-    private static int memPointer = 0;
+    private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
         greet();
@@ -11,11 +11,10 @@ public class Friday {
     }
 
     private static void listen() {
-    Scanner in = new Scanner(System.in);
-    listenLoop:
-    while (true) {
+        Scanner in = new Scanner(System.in);
+        listenLoop:
+        while (true) {
             String line = in.nextLine().trim();
-            // split command + rest
             String cmd;
             String rest;
             int sp = line.indexOf(' ');
@@ -27,11 +26,9 @@ public class Friday {
                 rest = line.substring(sp + 1).trim();
             }
 
-            // top separator for response
             indent();
             try {
                 if (cmd.isBlank()) {
-                    // Just ignore blank lines (no extra separator needed already printed)
                     indent();
                     continue;
                 }
@@ -72,10 +69,10 @@ public class Friday {
         if (desc == null || desc.isBlank()) {
             throw new FridayException(" A todo needs a description.");
         }
-        tasks[memPointer++] = new ToDo(desc);
+        tasks.add(new ToDo(desc));
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + tasks[memPointer - 1].display());
-        System.out.println(" Now you have " + memPointer + " tasks in the list.");
+        System.out.println("   " + tasks.get(tasks.size() - 1).display());
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
         indent();
     }
 
@@ -92,10 +89,10 @@ public class Friday {
         } else {
             desc = rest;
         }
-        tasks[memPointer++] = new Deadline(desc, by);
+        tasks.add(new Deadline(desc, by));
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + tasks[memPointer - 1].display());
-        System.out.println(" Now you have " + memPointer + " tasks in the list.");
+        System.out.println("   " + tasks.get(tasks.size() - 1).display());
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
         indent();
     }
 
@@ -117,7 +114,6 @@ public class Friday {
                 from = rest.substring(fromIdx + 5).trim();
             }
         } else {
-            // fallback: try to split on "/to" only
             if (toIdx != -1) {
                 desc = rest.substring(0, toIdx).trim();
                 to = rest.substring(toIdx + 3).trim();
@@ -125,18 +121,19 @@ public class Friday {
                 desc = rest;
             }
         }
-        tasks[memPointer++] = new Event(desc, from, to);
+        tasks.add(new Event(desc, from, to));
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + tasks[memPointer - 1].display());
-        System.out.println(" Now you have " + memPointer + " tasks in the list.");
+        System.out.println("   " + tasks.get(tasks.size() - 1).display());
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
         indent();
     }
 
     private static void mark(int idx) {
-        if (idx >= 1 && idx <= memPointer) {
-            tasks[idx - 1].markDone();
+        if (idx >= 1 && idx <= tasks.size()) {
+            Task t = tasks.get(idx - 1);
+            t.markDone();
             System.out.println(" Nice! I've marked this task as done:");
-            System.out.println("   " + tasks[idx - 1].display());
+            System.out.println("   " + t.display());
         } else {
             System.out.println(" That task number doesn't exist.");
         }
@@ -144,10 +141,11 @@ public class Friday {
     }
 
     private static void unmark(int idx) {
-        if (idx >= 1 && idx <= memPointer) {
-            tasks[idx - 1].markUndone();
+        if (idx >= 1 && idx <= tasks.size()) {
+            Task t = tasks.get(idx - 1);
+            t.markUndone();
             System.out.println(" OK, I've marked this task as not done yet:");
-            System.out.println("   " + tasks[idx - 1].display());
+            System.out.println("   " + t.display());
         } else {
             System.out.println(" That task number doesn't exist.");
         }
@@ -156,8 +154,8 @@ public class Friday {
 
     private static void list() {
         System.out.println(" Here are the tasks in your list:");
-        for (int i = 0; i < memPointer; i++) {
-            System.out.println(" " + (i + 1) + "." + tasks[i].display());
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.get(i).display());
         }
         indent();
     }
