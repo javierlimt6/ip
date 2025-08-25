@@ -35,6 +35,17 @@ public class Friday {
             if ("bye".equals(line)) {
                 bye();
                 break;
+            } else if ("list".equals(line)) {
+                int index = 1;
+                for (String el: memory) {
+                    if (index > memPointer) {
+                        break;
+                    }
+                    System.out.println(
+                        index + ". " + el
+                    );
+                    index++;                
+                }
             } else {
                 // currently adds text to memory
                 memory[memPointer] = line;
