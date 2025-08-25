@@ -2,55 +2,8 @@ import java.util.Scanner;
 
 public class Friday {
     private static final String IND = "____________________________________________________________";
-    private static Task[] tasks = new Task[100];
+    private static final Task[] tasks = new Task[100];
     private static int memPointer = 0;
-
-    private static abstract class Task {
-        boolean done;
-        String desc;
-        Task(String desc) { this.desc = desc; }
-        void markDone() { done = true; }
-        void markUndone() { done = false; }
-        abstract String typeLetter();
-        String statusBox() { return "[" + (done ? "X" : " ") + "]"; }
-        String display() {
-            return "[" + typeLetter() + "]" + statusBox() + " " + desc;
-        }
-    }
-
-    private static class ToDo extends Task {
-        ToDo(String desc) { super(desc); }
-        @Override String typeLetter() { return "T"; }
-    }
-
-    private static class Deadline extends Task {
-        String by;
-        Deadline(String desc, String by) { super(desc); this.by = by; }
-        @Override String typeLetter() { return "D"; }
-        @Override String display() {
-            String base = super.display();
-            return base + (by != null && !by.isBlank() ? " (by: " + by + ")" : "");
-        }
-    }
-
-    private static class Event extends Task {
-        String from;
-        String to;
-        Event(String desc, String from, String to) { super(desc); this.from = from; this.to = to; }
-        @Override String typeLetter() { return "E"; }
-        @Override String display() {
-            String base = super.display();
-            String details = "";
-            if (from != null && !from.isBlank()) {
-                details += " (from: " + from;
-                if (to != null && !to.isBlank()) details += " to: " + to;
-                details += ")";
-            } else if (to != null && !to.isBlank()) {
-                details += " (to: " + to + ")";
-            }
-            return base + details;
-        }
-    }
 
     public static void main(String[] args) {
         greet();
