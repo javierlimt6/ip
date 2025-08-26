@@ -1,13 +1,35 @@
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Files;
+import java.io.IOException;
 
 public class Friday {
     private static final String IND = "____________________________________________________________";
+    // Step 1: storage path definitions (OS-independent)
+    private static final Path DATA_DIR = Path.of("data");
+    private static final Path DATA_FILE = DATA_DIR.resolve("duke.txt");
     private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
+        initStorage();
         greet();
         listen();
+    }
+
+    // Step 1: Ensure data folder exists; create if missing. If file absent, start with empty list.
+    private static void initStorage() {
+        try {
+            if (Files.notExists(DATA_DIR)) {
+                Files.createDirectories(DATA_DIR);
+            }
+            // We only check existence; loading/parsing will be implemented in later steps.
+            if (Files.notExists(DATA_FILE)) {
+                // Start with empty tasks; optionally create an empty file later when saving.
+            }
+        } catch (IOException e) {
+            System.out.println(" Warning: Could not initialise storage: " + e.getMessage());
+        }
     }
 
     private static void listen() {
