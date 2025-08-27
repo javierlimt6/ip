@@ -1,4 +1,3 @@
-import java.util.Scanner;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class Friday {
-    private static final String IND = "____________________________________________________________";
     // Step 1: storage path definitions (OS-independent)
     // Storage path definitions with fallback:
     // Prefer writing inside src/main/data (keeps test expectations aligned), else use ./data
@@ -20,7 +18,7 @@ public class Friday {
     public static void main(String[] args) {
         initStorage();
         load(); // load tasks from duke.txt if present
-        greet();
+        Ui.greet();
         listen();
     }
 
@@ -29,7 +27,7 @@ public class Friday {
         try {
             Files.createDirectories(DATA_DIR);
         } catch (IOException e) {
-            System.out.println(" Warning: Could not initialise storage directory: " + e.getMessage());
+            Ui.printWarning("Could not initialise storage directory: " + e.getMessage());
         }
         DATA_FILE = DATA_DIR.resolve("duke.txt");
     }
@@ -75,10 +73,9 @@ public class Friday {
     }
 
     private static void listen() {
-        Scanner in = new Scanner(System.in);
         listenLoop:
         while (true) {
-            String line = in.nextLine().trim();
+            String line = Ui.readLine();
             String cmd;
             String rest;
             int sp = line.indexOf(' ');
@@ -90,15 +87,15 @@ public class Friday {
                 rest = line.substring(sp + 1).trim();
             }
 
-            indent();
+            Ui.printIndentation();
             try {
                 if (cmd.isBlank()) {
-                    indent();
+                    Ui.printIndentation();
                     continue;
                 }
                 switch (cmd) {
                     case "bye":
-                        bye();
+                        Ui.bye();
                         break listenLoop;
                     case "list":
                         list();
@@ -125,20 +122,16 @@ public class Friday {
                         throw new FridayException(" I don't recognise that command. Try: todo, deadline, event, list, mark, unmark, bye");
                 }
             } catch (FridayException e) {
-                System.out.println(e.getMessage());
-                indent();
+                Ui.printError(e.getMessage());
             }
         }
-        in.close();
+        Ui.closeScanner();
     }
 
     private static void addTodo(String desc) throws FridayException {
         taskList.addTodo(desc);
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + taskList.get(taskList.size() - 1).display());
-        System.out.println(" Now you have " + taskList.size() + " tasks in the list.");
+        Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
         save();
-        indent();
     }
 
     private static void addDeadline(String rest) throws FridayException {
@@ -163,20 +156,15 @@ public class Friday {
             }
         }
         taskList.addDeadline(desc, by);
-    save();
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + taskList.get(taskList.size() - 1).display());
-        System.out.println(" Now you have " + taskList.size() + " tasks in the list.");
-        indent();
+        save();
+        Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
     }
 
     private static void delete(int idx) throws FridayException {
+        Task deletedTask = taskList.get(idx - 1);
         taskList.delete(idx);
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + taskList.get(idx - 1).display());
-        System.out.println(" Now you have " + taskList.size() + " tasks in the list.");
+        Ui.printTaskDeleted(deletedTask, taskList.size());
         save();
-        indent();
     }
 
     private static void addEvent(String rest) throws FridayException {
@@ -205,56 +193,32 @@ public class Friday {
             }
         }
         taskList.addEvent(desc, from, to);
-    save();
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + taskList.get(taskList.size() - 1).display());
-        System.out.println(" Now you have " + taskList.size() + " tasks in the list.");
-        indent();
+        save();
+        Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
     }
 
     private static void mark(int idx) {
         try {
             taskList.mark(idx);
-            System.out.println(" Nice! I've marked this task as done:");
-            System.out.println("   " + taskList.get(idx - 1).display());
+            Ui.printTaskMarked(taskList.get(idx - 1));
             save();
         } catch (FridayException e) {
-            System.out.println(e.getMessage());
+            Ui.printError(e.getMessage());
         }
-        indent();
     }
 
     private static void unmark(int idx) {
         try {
             taskList.unmark(idx);
-            System.out.println(" OK, I've marked this task as not done yet:");
-            System.out.println("   " + taskList.get(idx - 1).display());
+            Ui.printTaskUnmarked(taskList.get(idx - 1));
             save();
         } catch (FridayException e) {
-            System.out.println(e.getMessage());
+            Ui.printError(e.getMessage());
         }
-        indent();
     }
 
     private static void list() {
-        System.out.print(taskList.list());
-        indent();
-    }
-
-    private static void indent() {
-        System.out.println(IND);
-    }
-
-    private static void greet() {
-        indent();
-        System.out.println(" Hello! I'm Friday");
-        System.out.println(" What can I do for you?");
-        indent();
-    }
-
-    private static void bye() {
-        System.out.println(" Bye. Hope to see you again soon!");
-        indent();
+        Ui.printTaskList(taskList.list());
     }
 
     private static int parseIndexFromString(String s) {
@@ -286,7 +250,7 @@ public class Friday {
                 }
             }
         } catch (IOException e) {
-            System.out.println(" Warning: Could not save tasks: " + e.getMessage());
+            Ui.printWarning("Could not save tasks: " + e.getMessage());
         }
     }
 
@@ -329,7 +293,7 @@ public class Friday {
                 parseAndAddLoaded(trimmed);
             }
         } catch (IOException e) {
-            System.out.println(" Warning: Could not load tasks: " + e.getMessage());
+            Ui.printWarning("Could not load tasks: " + e.getMessage());
         }
     }
 

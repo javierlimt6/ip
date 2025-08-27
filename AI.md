@@ -14,12 +14,13 @@ What I used the tool for (increments)
 - 2025-08-27 — Misc: added .gitignore to exclude persisted duke.txt and updated test input/EXPECTED.TXT.
 - 2025-08-27 — Level 8 Step 1: Update Deadline class to use LocalDate for date storage and formatted display.
 - 2025-08-27 — Refactor: Abstracted task list logic into TaskList class, encapsulating add/delete/mark/unmark operations and improving modularity.
+- 2025-08-27 — Refactor: Extracted all user interactions into Ui class, centralizing input/output operations and improving separation of concerns.
 
 Notes / observations
-- What worked: Rapid prototyping of CLI flows, parsing patterns, and serialisation format. Generated code was immediately runnable and easy to adapt.
-- What needed manual work: storage path resolution (CWD issues), small input-validation edge cases, and ensuring save() is called on every mutation.
-- Time saved: Estimated 2–4 hours across tasks that would otherwise be boilerplate and refactor work.
-- Recommendation: Review generated code for edge cases, add unit tests for load/save and parsing, and consider extracting Storage responsibilities into a dedicated class.
+- What worked: Rapid prototyping of CLI flows, parsing patterns, and serialisation format. Generated code was immediately runnable and easy to adapt. UI refactoring improved code organization by separating concerns.
+- What needed manual work: storage path resolution (CWD issues), small input-validation edge cases, and ensuring save() is called on every mutation. UI extraction required careful replacement of all System.out.println and Scanner usage.
+- Time saved: Estimated 2–4 hours across tasks that would otherwise be boilerplate and refactor work. UI refactoring streamlined future maintenance.
+- Recommendation: Review generated code for edge cases, add unit tests for load/save and parsing, and consider extracting Storage responsibilities into a dedicated class. UI class provides good foundation for future enhancements like colored output or GUI.
 
 Record of use
 - Assistant: GitHub Copilot (GPT-5 mini, Preview)
