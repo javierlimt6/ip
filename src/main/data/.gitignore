@@ -1,0 +1,2 @@
+# Ignore persisted task data files (duke.txt) wherever they appear
+**/duke.txt
