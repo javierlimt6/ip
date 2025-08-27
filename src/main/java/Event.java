@@ -20,4 +20,7 @@ public class Event extends Task {
         }
         return base + details;
     }
+
+    public String getFrom() { return from; }
+    public String getTo() { return to; }
 }

@@ -9,6 +9,8 @@ public abstract class Task {
     public void markDone() { done = true; }
     public void markUndone() { done = false; }
 
+    public boolean isDone() { return done; }
+
     // refactored to use enum
     public abstract TaskType getType();
 

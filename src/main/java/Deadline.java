@@ -10,4 +10,6 @@ public class Deadline extends Task {
         String base = super.display();
         return base + (by != null && !by.isBlank() ? " (by: " + by + ")" : "");
     }
+
+    public String getBy() { return by; }
 }
