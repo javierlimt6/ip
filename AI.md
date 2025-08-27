@@ -12,6 +12,8 @@ What I used the tool for (increments)
 - 2025-08-27 — Persistence: Step 1 create data dir; Step 2 save tasks to file after mutations; Step 3 load tasks at startup.
 - 2025-08-27 — Refactors: extracted Task subclasses into separate files, introduced TaskType enum, Command enum, moved to ArrayList<Task>, added delete command.
 - 2025-08-27 — Misc: added .gitignore to exclude persisted duke.txt and updated test input/EXPECTED.TXT.
+- 2025-08-27 — Level 8 Step 1: Update Deadline class to use LocalDate for date storage and formatted display.
+- 2025-08-27 — Level 8 Step 2: Update addDeadline parsing to use LocalDate.parse() with error handling and backward compatibility.
 
 Notes / observations
 - What worked: Rapid prototyping of CLI flows, parsing patterns, and serialisation format. Generated code was immediately runnable and easy to adapt.
@@ -22,4 +24,4 @@ Notes / observations
 Record of use
 - Assistant: GitHub Copilot (GPT-5 mini, Preview)
 - Dates: 2025-08-25 to 2025-08-27
-- Purpose: code generation, refactoring, persistence and error-handling guidance for the Friday
+- Purpose: code generation, refactoring, persistence and error-handling guidance for the Friday CLI project.

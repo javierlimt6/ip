@@ -5,6 +5,9 @@ import java.nio.file.Files;
 import java.io.IOException;
 import java.io.BufferedWriter;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Friday {
     private static final String IND = "____________________________________________________________";
@@ -148,12 +151,20 @@ public class Friday {
         }
         int byIdx = rest.indexOf("/by");
         String desc;
-        String by = "";
+        String byStr = "";
         if (byIdx != -1) {
             desc = rest.substring(0, byIdx).trim();
-            by = rest.substring(byIdx + 3).trim();
+            byStr = rest.substring(byIdx + 3).trim();
         } else {
             desc = rest;
+        }
+        LocalDate by = null;
+        if (!byStr.isBlank()) {
+            try {
+                by = LocalDate.parse(byStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            } catch (DateTimeParseException e) {
+                throw new FridayException(" Invalid date format. Use yyyy-mm-dd (e.g., 2019-10-15).");
+            }
         }
         tasks.add(new Deadline(desc, by));
     save();
@@ -299,7 +310,7 @@ public class Friday {
             type = "T";
         } else if (t instanceof Deadline) {
             type = "D";
-            extra = ((Deadline) t).getBy();
+            extra = ((Deadline) t).getByFormatted();
         } else if (t instanceof Event) {
             type = "E";
             Event ev = (Event) t;
@@ -338,7 +349,7 @@ public class Friday {
     private static void parseAndAddLoaded(String line) {
         // Expected serialized forms:
         // T | done | description
-        // D | done | description | by
+        // D | done | description | by (yyyy-mm-dd)
         // E | done | description | from || to
         String[] parts = line.split("\\s*\\|\\s*");
         if (parts.length < 3) return; // malformed; skip
@@ -352,7 +363,15 @@ public class Friday {
                 t = new ToDo(desc);
                 break;
             case "D":
-                String by = parts.length >= 4 ? parts[3] : "";
+                LocalDate by = null;
+                if (parts.length >= 4 && !parts[3].isBlank()) {
+                    try {
+                        by = LocalDate.parse(parts[3], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    } catch (DateTimeParseException e) {
+                        // Skip if date invalid
+                        return;
+                    }
+                }
                 t = new Deadline(desc, by);
                 break;
             case "E":

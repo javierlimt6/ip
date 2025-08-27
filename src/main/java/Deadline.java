@@ -1,23 +1,13 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class Deadline extends Task {
     private LocalDate by;
-    private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.ofPattern("MMM dd yyyy");
 
-    public Deadline(String desc, String byStr) throws FridayException {
+    public Deadline(String desc, LocalDate by) {
         super(desc);
-        if (byStr == null || byStr.isBlank()) {
-            this.by = null;
-        } else {
-            try {
-                this.by = LocalDate.parse(byStr, INPUT_FORMAT);
-            } catch (DateTimeParseException e) {
-                throw new FridayException(" Invalid date format. Use yyyy-mm-dd (e.g., 2019-10-15).");
-            }
-        }
+        this.by = by;
     }
 
     @Override public TaskType getType() { return TaskType.DEADLINE; }
@@ -36,6 +26,6 @@ public class Deadline extends Task {
 
     // For serialization compatibility, return formatted string
     public String getByFormatted() {
-        return by != null ? by.format(INPUT_FORMAT) : "";
+        return by != null ? by.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "";
     }
 }
