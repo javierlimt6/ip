@@ -17,7 +17,7 @@ public class Friday {
 
     public static void main(String[] args) {
         initStorage();
-        // load(); // (add back when you implement loading)
+    load(); // load tasks from duke.txt if present
         greet();
         listen();
     }
@@ -319,5 +319,59 @@ public class Friday {
             return String.join(" | ", type, String.valueOf(doneFlag), t.desc, extra);
         }
         return String.join(" | ", type, String.valueOf(doneFlag), t.desc);
+    }
+
+    // Step 3: load tasks at startup
+    private static void load() {
+        if (DATA_FILE == null || !Files.exists(DATA_FILE)) return;
+        try {
+            for (String line : Files.readAllLines(DATA_FILE)) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty()) continue;
+                parseAndAddLoaded(trimmed);
+            }
+        } catch (IOException e) {
+            System.out.println(" Warning: Could not load tasks: " + e.getMessage());
+        }
+    }
+
+    private static void parseAndAddLoaded(String line) {
+        // Expected serialized forms:
+        // T | done | description
+        // D | done | description | by
+        // E | done | description | from || to
+        String[] parts = line.split("\\s*\\|\\s*");
+        if (parts.length < 3) return; // malformed; skip
+        String type = parts[0];
+        boolean done = "1".equals(parts[1]);
+        String desc = parts[2];
+
+        Task t = null;
+        switch (type) {
+            case "T":
+                t = new ToDo(desc);
+                break;
+            case "D":
+                String by = parts.length >= 4 ? parts[3] : "";
+                t = new Deadline(desc, by);
+                break;
+            case "E":
+                String from = "";
+                String to = "";
+                if (parts.length >= 4) {
+                    String extra = parts[3];
+                    String[] ft = extra.split("\\s*\\|\\|\\s*", -1); // keep empty
+                    if (ft.length > 0) from = ft[0];
+                    if (ft.length > 1) to = ft[1];
+                }
+                t = new Event(desc, from, to);
+                break;
+            default:
+                return; // unknown type
+        }
+        if (t != null) {
+            if (done) t.markDone();
+            tasks.add(t);
+        }
     }
 }
