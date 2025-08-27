@@ -105,7 +105,7 @@ public class Friday {
                         delete(Parser.parseIndex(parsed.arguments));
                         break;
                     default:
-                        throw new FridayException(" I don't recognise that command. Try: todo, deadline, event, list, mark, unmark, bye");
+                        throw new FridayException(" I don't recognise that command. Try: todo, deadline, event, list, mark, unmark, delete, bye");
                 }
             } catch (FridayException e) {
                 Ui.printError(e.getMessage());

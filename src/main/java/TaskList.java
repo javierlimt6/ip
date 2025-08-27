@@ -57,7 +57,10 @@ public class TaskList {
         StringBuilder sb = new StringBuilder();
         sb.append(" Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
-            sb.append(" ").append(i + 1).append(".").append(tasks.get(i).display()).append("\n");
+            sb.append(" ").append(i + 1).append(".").append(tasks.get(i).display());
+            if (i < tasks.size() - 1) {
+                sb.append("\n");
+            }
         }
         return sb.toString();
     }
