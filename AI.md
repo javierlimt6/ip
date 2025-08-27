@@ -15,12 +15,13 @@ What I used the tool for (increments)
 - 2025-08-27 — Level 8 Step 1: Update Deadline class to use LocalDate for date storage and formatted display.
 - 2025-08-27 — Refactor: Abstracted task list logic into TaskList class, encapsulating add/delete/mark/unmark operations and improving modularity.
 - 2025-08-27 — Refactor: Extracted all user interactions into Ui class, centralizing input/output operations and improving separation of concerns.
+- 2025-08-27 — Refactor: Abstracted all parsing/validation logic into Parser class, handling command parsing, deadline/event arguments, task indices, and serialized task data.
 
 Notes / observations
-- What worked: Rapid prototyping of CLI flows, parsing patterns, and serialisation format. Generated code was immediately runnable and easy to adapt. UI refactoring improved code organization by separating concerns.
-- What needed manual work: storage path resolution (CWD issues), small input-validation edge cases, and ensuring save() is called on every mutation. UI extraction required careful replacement of all System.out.println and Scanner usage.
-- Time saved: Estimated 2–4 hours across tasks that would otherwise be boilerplate and refactor work. UI refactoring streamlined future maintenance.
-- Recommendation: Review generated code for edge cases, add unit tests for load/save and parsing, and consider extracting Storage responsibilities into a dedicated class. UI class provides good foundation for future enhancements like colored output or GUI.
+- What worked: Rapid prototyping of CLI flows, parsing patterns, and serialisation format. Generated code was immediately runnable and easy to adapt. UI refactoring improved code organization by separating concerns. Parser class centralizes all input validation and parsing logic.
+- What needed manual work: storage path resolution (CWD issues), small input-validation edge cases, and ensuring save() is called on every mutation. UI extraction required careful replacement of all System.out.println and Scanner usage. Parser extraction involved identifying and moving all parsing logic.
+- Time saved: Estimated 2–4 hours across tasks that would otherwise be boilerplate and refactor work. UI refactoring streamlined future maintenance. Parser class makes the code more testable and maintainable.
+- Recommendation: Review generated code for edge cases, add unit tests for load/save and parsing, and consider extracting Storage responsibilities into a dedicated class. UI class provides good foundation for future enhancements like colored output or GUI. Parser class enables easier testing of parsing logic and better error handling.
 
 Record of use
 - Assistant: GitHub Copilot (GPT-5 mini, Preview)

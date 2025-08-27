@@ -3,14 +3,8 @@ import java.nio.file.Files;
 import java.io.IOException;
 import java.io.BufferedWriter;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class Friday {
-    // Step 1: storage path definitions (OS-independent)
-    // Storage path definitions with fallback:
-    // Prefer writing inside src/main/data (keeps test expectations aligned), else use ./data
     private static Path DATA_DIR;
     private static Path DATA_FILE;
     private static final TaskList taskList = new TaskList();
@@ -19,7 +13,7 @@ public class Friday {
         initStorage();
         load(); // load tasks from duke.txt if present
         Ui.greet();
-        listen();
+        listen(); // listen for any commands then parse them
     }
 
     private static void initStorage() {
@@ -75,25 +69,17 @@ public class Friday {
     private static void listen() {
         listenLoop:
         while (true) {
-            String line = Ui.readLine();
-            String cmd;
-            String rest;
-            int sp = line.indexOf(' ');
-            if (sp == -1) {
-                cmd = line;
-                rest = "";
-            } else {
-                cmd = line.substring(0, sp);
-                rest = line.substring(sp + 1).trim();
-            }
-
             Ui.printIndent();
             try {
-                if (cmd.isBlank()) {
+                String line = Ui.readLine();
+                Parser.ParsedCommand parsed = Parser.parseCommand(line); //factory method
+
+                if (parsed.command.isBlank()) { //no input
                     Ui.printIndent();
                     continue;
                 }
-                switch (cmd) {
+
+                switch (parsed.command) { // identify all the commands
                     case "bye":
                         Ui.bye();
                         break listenLoop;
@@ -101,23 +87,23 @@ public class Friday {
                         list();
                         break;
                     case "mark":
-                        mark(requireIndex(rest));
+                        mark(Parser.parseIndex(parsed.arguments));
                         break;
                     case "unmark":
-                        unmark(requireIndex(rest));
+                        unmark(Parser.parseIndex(parsed.arguments));
                         break;
                     case "todo":
-                        addTodo(rest);
+                        addTodo(parsed.arguments);
                         break;
                     case "deadline":
-                        addDeadline(rest);
+                        addDeadline(parsed.arguments);
                         break;
                     case "event":
-                        addEvent(rest);
+                        addEvent(parsed.arguments);
                         break;
                     case "delete":
-                        delete(requireIndex(rest));
-                        break; // Fix fallthrough
+                        delete(Parser.parseIndex(parsed.arguments));
+                        break;
                     default:
                         throw new FridayException(" I don't recognise that command. Try: todo, deadline, event, list, mark, unmark, bye");
                 }
@@ -135,27 +121,8 @@ public class Friday {
     }
 
     private static void addDeadline(String rest) throws FridayException {
-        if (rest == null || rest.isBlank()) {
-            throw new FridayException(" A deadline needs a description.");
-        }
-        int byIdx = rest.indexOf("/by");
-        String desc;
-        String byStr = "";
-        if (byIdx != -1) {
-            desc = rest.substring(0, byIdx).trim();
-            byStr = rest.substring(byIdx + 3).trim();
-        } else {
-            desc = rest;
-        }
-        LocalDate by = null;
-        if (!byStr.isBlank()) {
-            try {
-                by = LocalDate.parse(byStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            } catch (DateTimeParseException e) {
-                throw new FridayException(" Invalid date format. Use yyyy-mm-dd (e.g., 2019-10-15).");
-            }
-        }
-        taskList.addDeadline(desc, by);
+        Parser.DeadlineArgs args = Parser.parseDeadlineArgs(rest);
+        taskList.addDeadline(args.description, args.by);
         save();
         Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
     }
@@ -168,31 +135,8 @@ public class Friday {
     }
 
     private static void addEvent(String rest) throws FridayException {
-        if (rest == null || rest.isBlank()) {
-            throw new FridayException(" An event needs a description.");
-        }
-        int fromIdx = rest.indexOf("/from");
-        int toIdx = rest.indexOf("/to");
-        String desc;
-        String from = "";
-        String to = "";
-        if (fromIdx != -1) {
-            desc = rest.substring(0, fromIdx).trim();
-            if (toIdx != -1 && toIdx > fromIdx) {
-                from = rest.substring(fromIdx + 5, toIdx).trim();
-                to = rest.substring(toIdx + 3).trim();
-            } else {
-                from = rest.substring(fromIdx + 5).trim();
-            }
-        } else {
-            if (toIdx != -1) {
-                desc = rest.substring(0, toIdx).trim();
-                to = rest.substring(toIdx + 3).trim();
-            } else {
-                desc = rest;
-            }
-        }
-        taskList.addEvent(desc, from, to);
+        Parser.EventArgs args = Parser.parseEventArgs(rest);
+        taskList.addEvent(args.description, args.from, args.to);
         save();
         Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
     }
@@ -221,22 +165,6 @@ public class Friday {
         Ui.printTaskList(taskList.list());
     }
 
-    private static int parseIndexFromString(String s) {
-        if (s == null || s.isBlank()) return -1;
-        try {
-            return Integer.parseInt(s.trim());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
-
-    private static int requireIndex(String s) throws FridayException {
-        int idx = parseIndexFromString(s);
-        if (idx < 1) throw new FridayException(" Provide a valid task number.");
-        return idx;
-    }
-
-    // Step 2: persist tasks after each change
     private static void save() {
         if (DATA_FILE == null) return;
         try {
@@ -283,65 +211,19 @@ public class Friday {
         return String.join(" | ", type, String.valueOf(doneFlag), t.desc);
     }
 
-    // Step 3: load tasks at startup
     private static void load() {
         if (DATA_FILE == null || !Files.exists(DATA_FILE)) return;
         try {
             for (String line : Files.readAllLines(DATA_FILE)) {
                 String trimmed = line.trim();
                 if (trimmed.isEmpty()) continue;
-                parseAndAddLoaded(trimmed);
+                Task t = Parser.parseSerializedTask(trimmed);
+                if (t != null) {
+                    taskList.add(t);
+                }
             }
         } catch (IOException e) {
             Ui.printWarning("Could not load tasks: " + e.getMessage());
-        }
-    }
-
-    private static void parseAndAddLoaded(String line) {
-        // Expected serialized forms:
-        // T | done | description
-        // D | done | description | by (yyyy-mm-dd)
-        // E | done | description | from || to
-        String[] parts = line.split("\\s*\\|\\s*");
-        if (parts.length < 3) return; // malformed; skip
-        String type = parts[0];
-        boolean done = "1".equals(parts[1]);
-        String desc = parts[2];
-
-        Task t = null;
-        switch (type) {
-            case "T":
-                t = new ToDo(desc);
-                break;
-            case "D":
-                LocalDate by = null;
-                if (parts.length >= 4 && !parts[3].isBlank()) {
-                    try {
-                        by = LocalDate.parse(parts[3], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    } catch (DateTimeParseException e) {
-                        // Skip if date invalid
-                        return;
-                    }
-                }
-                t = new Deadline(desc, by);
-                break;
-            case "E":
-                String from = "";
-                String to = "";
-                if (parts.length >= 4) {
-                    String extra = parts[3];
-                    String[] ft = extra.split("\\s*\\|\\|\\s*", -1); // keep empty
-                    if (ft.length > 0) from = ft[0];
-                    if (ft.length > 1) to = ft[1];
-                }
-                t = new Event(desc, from, to);
-                break;
-            default:
-                return; // unknown type
-        }
-        if (t != null) {
-            if (done) t.markDone();
-            taskList.add(t);
         }
     }
 }
