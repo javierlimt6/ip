@@ -13,7 +13,7 @@ What I used the tool for (increments)
 - 2025-08-27 — Refactors: extracted Task subclasses into separate files, introduced TaskType enum, Command enum, moved to ArrayList<Task>, added delete command.
 - 2025-08-27 — Misc: added .gitignore to exclude persisted duke.txt and updated test input/EXPECTED.TXT.
 - 2025-08-27 — Level 8 Step 1: Update Deadline class to use LocalDate for date storage and formatted display.
-- 2025-08-27 — Level 8 Step 2: Update addDeadline parsing to use LocalDate.parse() with error handling and backward compatibility.
+- 2025-08-27 — Refactor: Abstracted task list logic into TaskList class, encapsulating add/delete/mark/unmark operations and improving modularity.
 
 Notes / observations
 - What worked: Rapid prototyping of CLI flows, parsing patterns, and serialisation format. Generated code was immediately runnable and easy to adapt.

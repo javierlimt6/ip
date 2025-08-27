@@ -1,5 +1,4 @@
 import java.util.Scanner;
-import java.util.ArrayList;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.io.IOException;
@@ -16,11 +15,11 @@ public class Friday {
     // Prefer writing inside src/main/data (keeps test expectations aligned), else use ./data
     private static Path DATA_DIR;
     private static Path DATA_FILE;
-    private static final ArrayList<Task> tasks = new ArrayList<>();
+    private static final TaskList taskList = new TaskList();
 
     public static void main(String[] args) {
         initStorage();
-    load(); // load tasks from duke.txt if present
+        load(); // load tasks from duke.txt if present
         greet();
         listen();
     }
@@ -134,14 +133,11 @@ public class Friday {
     }
 
     private static void addTodo(String desc) throws FridayException {
-        if (desc == null || desc.isBlank()) {
-            throw new FridayException(" A todo needs a description.");
-        }
-        tasks.add(new ToDo(desc));
-    save();
+        taskList.addTodo(desc);
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + tasks.get(tasks.size() - 1).display());
-        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        System.out.println("   " + taskList.get(taskList.size() - 1).display());
+        System.out.println(" Now you have " + taskList.size() + " tasks in the list.");
+        save();
         indent();
     }
 
@@ -166,24 +162,20 @@ public class Friday {
                 throw new FridayException(" Invalid date format. Use yyyy-mm-dd (e.g., 2019-10-15).");
             }
         }
-        tasks.add(new Deadline(desc, by));
+        taskList.addDeadline(desc, by);
     save();
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + tasks.get(tasks.size() - 1).display());
-        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        System.out.println("   " + taskList.get(taskList.size() - 1).display());
+        System.out.println(" Now you have " + taskList.size() + " tasks in the list.");
         indent();
     }
 
     private static void delete(int idx) throws FridayException {
-        if (idx >= 1 && idx <= tasks.size()) {
-            Task t = tasks.remove(idx - 1);
-            System.out.println(" Noted. I've removed this task:");
-            System.out.println("   " + t.display());
-            System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-            save();
-        } else {
-            System.out.println(" That task number doesn't exist.");
-        }
+        taskList.delete(idx);
+        System.out.println(" Noted. I've removed this task:");
+        System.out.println("   " + taskList.get(idx - 1).display());
+        System.out.println(" Now you have " + taskList.size() + " tasks in the list.");
+        save();
         indent();
     }
 
@@ -212,45 +204,40 @@ public class Friday {
                 desc = rest;
             }
         }
-        tasks.add(new Event(desc, from, to));
+        taskList.addEvent(desc, from, to);
     save();
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + tasks.get(tasks.size() - 1).display());
-        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        System.out.println("   " + taskList.get(taskList.size() - 1).display());
+        System.out.println(" Now you have " + taskList.size() + " tasks in the list.");
         indent();
     }
 
     private static void mark(int idx) {
-        if (idx >= 1 && idx <= tasks.size()) {
-            Task t = tasks.get(idx - 1);
-            t.markDone();
+        try {
+            taskList.mark(idx);
             System.out.println(" Nice! I've marked this task as done:");
-            System.out.println("   " + t.display());
+            System.out.println("   " + taskList.get(idx - 1).display());
             save();
-        } else {
-            System.out.println(" That task number doesn't exist.");
+        } catch (FridayException e) {
+            System.out.println(e.getMessage());
         }
         indent();
     }
 
     private static void unmark(int idx) {
-        if (idx >= 1 && idx <= tasks.size()) {
-            Task t = tasks.get(idx - 1);
-            t.markUndone();
+        try {
+            taskList.unmark(idx);
             System.out.println(" OK, I've marked this task as not done yet:");
-            System.out.println("   " + t.display());
+            System.out.println("   " + taskList.get(idx - 1).display());
             save();
-        } else {
-            System.out.println(" That task number doesn't exist.");
+        } catch (FridayException e) {
+            System.out.println(e.getMessage());
         }
         indent();
     }
 
     private static void list() {
-        System.out.println(" Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i).display());
-        }
+        System.out.print(taskList.list());
         indent();
     }
 
@@ -293,7 +280,7 @@ public class Friday {
                 Files.createDirectories(DATA_DIR);
             }
             try (BufferedWriter bw = Files.newBufferedWriter(DATA_FILE)) {
-                for (Task t : tasks) {
+                for (Task t : taskList.getTasks()) {
                     bw.write(serialize(t));
                     bw.newLine();
                 }
@@ -390,7 +377,7 @@ public class Friday {
         }
         if (t != null) {
             if (done) t.markDone();
-            tasks.add(t);
+            taskList.add(t);
         }
     }
 }
