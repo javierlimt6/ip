@@ -4,43 +4,72 @@ import java.nio.file.Path;
 import java.nio.file.Files;
 import java.io.IOException;
 import java.io.BufferedWriter;
+import java.nio.file.Paths;
 
 public class Friday {
     private static final String IND = "____________________________________________________________";
     // Step 1: storage path definitions (OS-independent)
     // Storage path definitions with fallback:
     // Prefer writing inside src/main/data (keeps test expectations aligned), else use ./data
-    private static final Path PRIMARY_DIR = Path.of("src", "main", "data");
-    private static final Path SECONDARY_DIR = Path.of("data");
-    private static Path DATA_DIR; // resolved at runtime
-    private static Path DATA_FILE; // duke.txt path
+    private static Path DATA_DIR;
+    private static Path DATA_FILE;
     private static final ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
         initStorage();
+        // load(); // (add back when you implement loading)
         greet();
         listen();
     }
 
-    // Step 1: Ensure data folder exists; create if missing. If file absent, start with empty list.
     private static void initStorage() {
+        DATA_DIR = locateDataDir();
         try {
-            // Decide which directory to use
-            if (Files.exists(PRIMARY_DIR) || Files.exists(PRIMARY_DIR.getParent())) {
-                DATA_DIR = PRIMARY_DIR;
-            } else {
-                DATA_DIR = SECONDARY_DIR;
-            }
-            if (Files.notExists(DATA_DIR)) {
-                Files.createDirectories(DATA_DIR);
-            }
-            DATA_FILE = DATA_DIR.resolve("duke.txt");
-            if (Files.notExists(DATA_FILE)) {
-                // defer creation until first save
-            }
+            Files.createDirectories(DATA_DIR);
         } catch (IOException e) {
-            System.out.println(" Warning: Could not initialise storage: " + e.getMessage());
+            System.out.println(" Warning: Could not initialise storage directory: " + e.getMessage());
         }
+        DATA_FILE = DATA_DIR.resolve("duke.txt");
+    }
+
+    /**
+     * Always resolve to the same physical directory: ip/src/main/data
+     * regardless of where the program is launched from.
+     * Strategy:
+     * 1. If env FRIDAY_DATA_DIR set, use it.
+     * 2. Walk up from current working directory; at each level check:
+     *      <level>/src/main/data
+     *      <level>/ip/src/main/data   (handles running from parent of ip)
+     * 3. Fallback: currentWorkingDir/data
+     */
+    private static Path locateDataDir() {
+        String env = System.getenv("FRIDAY_DATA_DIR");
+        if (env != null && !env.isBlank()) {
+            return Paths.get(env).toAbsolutePath().normalize();
+        }
+
+        Path cwd = Paths.get("").toAbsolutePath().normalize();
+        Path cursor = cwd;
+
+        while (cursor != null) {
+            Path direct = cursor.resolve("src").resolve("main").resolve("data");
+            if (Files.isDirectory(direct)) {
+                return direct;
+            }
+            Path underIp = cursor.resolve("ip").resolve("src").resolve("main").resolve("data");
+            if (Files.isDirectory(underIp)) {
+                return underIp;
+            }
+            cursor = cursor.getParent();
+        }
+
+        // If not found, assume we are *inside* ip (or anywhere) and create ip/src/main/data relative if possible
+        // Try to detect an 'ip' directory downward from cwd (rare case) — otherwise fallback to ./data
+        Path guessIp = cwd.resolve("ip").resolve("src").resolve("main").resolve("data");
+        if (Files.exists(guessIp.getParent())) {
+            return guessIp;
+        }
+        return cwd.resolve("data");
     }
 
     private static void listen() {
@@ -247,6 +276,7 @@ public class Friday {
 
     // Step 2: persist tasks after each change
     private static void save() {
+        if (DATA_FILE == null) return;
         try {
             if (Files.notExists(DATA_DIR)) {
                 Files.createDirectories(DATA_DIR);
@@ -255,7 +285,6 @@ public class Friday {
                 for (Task t : tasks) {
                     bw.write(serialize(t));
                     bw.newLine();
-                    System.out.println("DEBUG saving to " + DATA_FILE);
                 }
             }
         } catch (IOException e) {
