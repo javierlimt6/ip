@@ -87,10 +87,10 @@ public class Friday {
                 rest = line.substring(sp + 1).trim();
             }
 
-            Ui.printIndentation();
+            Ui.printIndent();
             try {
                 if (cmd.isBlank()) {
-                    Ui.printIndentation();
+                    Ui.printIndent();
                     continue;
                 }
                 switch (cmd) {
