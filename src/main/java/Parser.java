@@ -58,7 +58,7 @@ public class Parser {
             try {
                 by = LocalDate.parse(byStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             } catch (DateTimeParseException e) {
-                throw new FridayException(" Invalid date format. Use yyyy-MM-dd (e.g., 2019-10-15).");
+                throw new FridayException(" Invalid date format. Use yyyy-MM-dd (e.g., 2025-10-15).");
             }
         }
 

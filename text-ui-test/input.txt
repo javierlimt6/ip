@@ -1,21 +1,21 @@
 todo borrow book
-deadline return book /by 2019-10-15
+deadline return book /by 2025-10-15
 event project meeting /from Mon 2pm /to 4pm
-event prepare slides /to 11/10/2019
+event prepare slides /to 11/10/2025
 list
 mark 1
 unmark 1
 delete 2
 list
 todo read book
-deadline submit assignment /by 2019-12-01
-event team meeting /from 2019-12-02 10am /to 12pm
+deadline submit assignment /by 2025-12-01
+event team meeting /from 2025-12-02 10am /to 12pm
 list
 mark 3
 unmark 3
 delete 1
 list
-deadline invalid date /by 2019-13-01
+deadline invalid date /by 2025-13-01
 event incomplete /from
 mark 99
 unmark 0
