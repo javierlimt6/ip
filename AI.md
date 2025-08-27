@@ -4,19 +4,22 @@ Tool used
 - GPT-5 mini (Preview) via GitHub Copilot assistant.
 
 What I used the tool for (increments)
-- Level 0: rename project class to Friday and implement greeting/exit skeleton.
-- Level 1: add echo behaviour and refactor listen loop into listen().
-- Added command dispatch map (command -> method).
-- Level 4: implement Task hierarchy (ToDo, Deadline, Event) and commands: todo, deadline, event, list, mark, unmark.
-- Several iterative refactors to improve structure and formatting.
+- 2025-08-25 — Level 0: Rename Duke -> Friday; greeting/exit skeleton.
+- 2025-08-25 — Level 1: Echo input and refactor listen() method.
+- 2025-08-26 — Added command dispatch map and refactor to Command enum.
+- 2025-08-26 — Level 4: Implement Task hierarchy (ToDo, Deadline, Event).
+- 2025-08-26 — Level 5: Improve error handling with FridayException.
+- 2025-08-27 — Persistence: Step 1 create data dir; Step 2 save tasks to file after mutations; Step 3 load tasks at startup.
+- 2025-08-27 — Refactors: extracted Task subclasses into separate files, introduced TaskType enum, Command enum, moved to ArrayList<Task>, added delete command.
+- 2025-08-27 — Misc: added .gitignore to exclude persisted duke.txt and updated test input/EXPECTED.TXT.
 
 Notes / observations
-- What worked: rapid prototyping of command parsing, task classes, and CLI interaction. The assistant provided concise, compilable Java snippets that required minimal edits.
-- What didn't: some small stylistic choices and edge cases (e.g., input validation, persistence) needed manual review and minor fixes.
-- Time saved: significantly reduced boilerplate and iteration time (estimate: 1–3 hours depending on feature).
-- Recommendations: review generated code for edge cases, add unit tests and persistence, and incrementally refactor to smaller classes/files.
+- What worked: Rapid prototyping of CLI flows, parsing patterns, and serialisation format. Generated code was immediately runnable and easy to adapt.
+- What needed manual work: storage path resolution (CWD issues), small input-validation edge cases, and ensuring save() is called on every mutation.
+- Time saved: Estimated 2–4 hours across tasks that would otherwise be boilerplate and refactor work.
+- Recommendation: Review generated code for edge cases, add unit tests for load/save and parsing, and consider extracting Storage responsibilities into a dedicated class.
 
 Record of use
-- Date: 2025-08-25
 - Assistant: GitHub Copilot (GPT-5 mini, Preview)
-- Purpose: code generation and refactor assistance for the ip (Friday) CLI project.
+- Dates: 2025-08-25 to 2025-08-27
+- Purpose: code generation, refactoring, persistence and error-handling guidance for the Friday
