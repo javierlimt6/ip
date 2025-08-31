@@ -1,3 +1,5 @@
+package friday;
+
 public enum TaskType {
     TODO("T"),
     DEADLINE("D"),

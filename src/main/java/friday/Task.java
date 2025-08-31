@@ -1,3 +1,5 @@
+package friday;
+
 public abstract class Task {
     private boolean done;
     public String desc;
