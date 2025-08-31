@@ -1,17 +1,17 @@
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.io.IOException;
-import java.io.BufferedWriter;
 import java.nio.file.Paths;
 
 public class Friday {
     private static Path DATA_DIR;
     private static Path DATA_FILE;
     private static final TaskList taskList = new TaskList();
+    private static Storage storage;
 
     public static void main(String[] args) {
         initStorage();
-        load(); // load tasks from duke.txt if present
+        storage.load(); // load tasks from duke.txt if present
         Ui.greet();
         listen(); // listen for any commands then parse them
     }
@@ -24,6 +24,7 @@ public class Friday {
             Ui.printWarning("Could not initialise storage directory: " + e.getMessage());
         }
         DATA_FILE = DATA_DIR.resolve("duke.txt");
+        storage = new Storage(DATA_FILE, taskList);
     }
 
     /**
@@ -117,13 +118,13 @@ public class Friday {
     private static void addTodo(String desc) throws FridayException {
         taskList.addTodo(desc);
         Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
-        save();
+        storage.save();
     }
 
     private static void addDeadline(String rest) throws FridayException {
         Parser.DeadlineArgs args = Parser.parseDeadlineArgs(rest);
         taskList.addDeadline(args.description, args.by);
-        save();
+        storage.save();
         Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
     }
 
@@ -131,13 +132,13 @@ public class Friday {
         Task deletedTask = taskList.get(idx - 1);
         taskList.delete(idx);
         Ui.printTaskDeleted(deletedTask, taskList.size());
-        save();
+        storage.save();
     }
 
     private static void addEvent(String rest) throws FridayException {
         Parser.EventArgs args = Parser.parseEventArgs(rest);
         taskList.addEvent(args.description, args.from, args.to);
-        save();
+        storage.save();
         Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
     }
 
@@ -145,7 +146,7 @@ public class Friday {
         try {
             taskList.mark(idx);
             Ui.printTaskMarked(taskList.get(idx - 1));
-            save();
+            storage.save();
         } catch (FridayException e) {
             Ui.printError(e.getMessage());
         }
@@ -155,7 +156,7 @@ public class Friday {
         try {
             taskList.unmark(idx);
             Ui.printTaskUnmarked(taskList.get(idx - 1));
-            save();
+            storage.save();
         } catch (FridayException e) {
             Ui.printError(e.getMessage());
         }
@@ -163,67 +164,5 @@ public class Friday {
 
     private static void list() {
         Ui.printTaskList(taskList.list());
-    }
-
-    private static void save() {
-        if (DATA_FILE == null) return;
-        try {
-            if (Files.notExists(DATA_DIR)) {
-                Files.createDirectories(DATA_DIR);
-            }
-            try (BufferedWriter bw = Files.newBufferedWriter(DATA_FILE)) {
-                for (Task t : taskList.getTasks()) {
-                    bw.write(serialize(t));
-                    bw.newLine();
-                }
-            }
-        } catch (IOException e) {
-            Ui.printWarning("Could not save tasks: " + e.getMessage());
-        }
-    }
-
-    private static String serialize(Task t) {
-        String type;
-        String extra = "";
-        if (t instanceof ToDo) {
-            type = "T";
-        } else if (t instanceof Deadline) {
-            type = "D";
-            extra = ((Deadline) t).getByFormatted();
-        } else if (t instanceof Event) {
-            type = "E";
-            Event ev = (Event) t;
-            // Combine from/to with a delimiter so we can parse later: from || to
-            String from = ev.getFrom() == null ? "" : ev.getFrom();
-            String to = ev.getTo() == null ? "" : ev.getTo();
-            extra = from + " || " + to; // always have the delimiter for parsing
-        } else {
-            type = "?"; // fallback
-        }
-        int doneFlag = t.isDone() ? 1 : 0;
-        // Format: TYPE | doneFlag | description | extra (extra omitted if blank except for Event delimiter form)
-        if (type.equals("E")) {
-            return String.join(" | ", type, String.valueOf(doneFlag), t.desc, extra);
-        }
-        if (!extra.isBlank()) {
-            return String.join(" | ", type, String.valueOf(doneFlag), t.desc, extra);
-        }
-        return String.join(" | ", type, String.valueOf(doneFlag), t.desc);
-    }
-
-    private static void load() {
-        if (DATA_FILE == null || !Files.exists(DATA_FILE)) return;
-        try {
-            for (String line : Files.readAllLines(DATA_FILE)) {
-                String trimmed = line.trim();
-                if (trimmed.isEmpty()) continue;
-                Task t = Parser.parseSerializedTask(trimmed);
-                if (t != null) {
-                    taskList.add(t);
-                }
-            }
-        } catch (IOException e) {
-            Ui.printWarning("Could not load tasks: " + e.getMessage());
-        }
     }
 }
