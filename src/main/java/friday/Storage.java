@@ -67,6 +67,9 @@ public class Storage {
 
     /**
      * Serializes a task into a string format for storage.
+     *
+     * @param t The task to serialize.
+     * @return The serialized string representation of the task.
      */
     private String serialize(Task t) {
         String type;

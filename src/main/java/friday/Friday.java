@@ -29,6 +29,9 @@ public class Friday {
         listen(); // listen for any commands then parse them
     }
 
+    /**
+     * Initializes the storage by locating the data directory and setting up the data file.
+     */
     private static void initStorage() {
         DATA_DIR = locateDataDir();
         try {
@@ -46,9 +49,11 @@ public class Friday {
      * Strategy:
      * 1. If env FRIDAY_DATA_DIR set, use it.
      * 2. Walk up from current working directory; at each level check:
-     * <level>/src/main/data
-     * <level>/ip/src/main/data (handles running from parent of ip)
+     *      <level>/src/main/data
+     *      <level>/ip/src/main/data (handles running from parent of ip)
      * 3. Fallback: currentWorkingDir/data
+     *
+     * @return The path to the data directory.
      */
     private static Path locateDataDir() {
         String env = System.getenv("FRIDAY_DATA_DIR");
@@ -82,6 +87,9 @@ public class Friday {
         return cwd.resolve("data");
     }
 
+    /**
+     * Starts the main command listening loop, parsing and executing user commands.
+     */
     private static void listen() {
         listenLoop: while (true) {
             Ui.printIndent();
@@ -130,12 +138,24 @@ public class Friday {
         Ui.closeScanner();
     }
 
+    /**
+     * Adds a todo task to the list and saves the changes.
+     *
+     * @param desc The description of the todo.
+     * @throws FridayException If the description is invalid.
+     */
     private static void addTodo(String desc) throws FridayException {
         taskList.addTodo(desc);
         Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
         storage.save();
     }
 
+    /**
+     * Adds a deadline task to the list and saves the changes.
+     *
+     * @param rest The arguments string for the deadline.
+     * @throws FridayException If parsing or validation fails.
+     */
     private static void addDeadline(String rest) throws FridayException {
         Parser.DeadlineArgs args = Parser.parseDeadlineArgs(rest);
         taskList.addDeadline(args.description, args.by);
@@ -143,6 +163,12 @@ public class Friday {
         Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
     }
 
+    /**
+     * Deletes a task from the list and saves the changes.
+     *
+     * @param idx The 1-based index of the task to delete.
+     * @throws FridayException If the index is invalid.
+     */
     private static void delete(int idx) throws FridayException {
         Task deletedTask = taskList.get(idx - 1);
         taskList.delete(idx);
@@ -150,6 +176,12 @@ public class Friday {
         storage.save();
     }
 
+    /**
+     * Adds an event task to the list and saves the changes.
+     *
+     * @param rest The arguments string for the event.
+     * @throws FridayException If parsing or validation fails.
+     */
     private static void addEvent(String rest) throws FridayException {
         Parser.EventArgs args = Parser.parseEventArgs(rest);
         taskList.addEvent(args.description, args.from, args.to);
@@ -157,6 +189,11 @@ public class Friday {
         Ui.printTaskAdded(taskList.get(taskList.size() - 1), taskList.size());
     }
 
+    /**
+     * Marks a task as done and saves the changes.
+     *
+     * @param idx The 1-based index of the task to mark.
+     */
     private static void mark(int idx) {
         try {
             taskList.mark(idx);
@@ -167,6 +204,11 @@ public class Friday {
         }
     }
 
+    /**
+     * Marks a task as undone and saves the changes.
+     *
+     * @param idx The 1-based index of the task to unmark.
+     */
     private static void unmark(int idx) {
         try {
             taskList.unmark(idx);
