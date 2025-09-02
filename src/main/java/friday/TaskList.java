@@ -154,4 +154,30 @@ public class TaskList {
     public void add(Task t) {
         tasks.add(t);
     }
+
+    /**
+     * Finds tasks whose descriptions contain the given keyword.
+     *
+     * @param keyword The keyword to search for.
+     * @return A formatted string of matching tasks.
+     */
+    public String find(String keyword) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Here are the matching tasks in your list:\n");
+        int count = 0;
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getDesc().toLowerCase().contains(keyword.toLowerCase())) {
+                count++;
+                sb.append(" ").append(count).append(".").append(tasks.get(i).display());
+                if (i < tasks.size() - 1) {
+                    sb.append("\n");
+                }
+            }
+        }
+        if (count == 0) {
+            sb.setLength(0); // clear
+            sb.append("No matching tasks found.");
+        }
+        return sb.toString();
+    }
 }

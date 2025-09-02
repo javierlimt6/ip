@@ -127,9 +127,12 @@ public class Friday {
                     case "delete":
                         delete(Parser.parseIndex(parsed.arguments));
                         break;
+                    case "find":
+                        find(parsed.arguments);
+                        break;
                     default:
                         throw new FridayException("I don't recognise that command. Try: todo, deadline, event, " +
-                                "list, mark, unmark, delete, bye");
+                                "list, mark, unmark, delete, find, bye");
                 }
             } catch (FridayException e) {
                 Ui.printError(e.getMessage());
@@ -221,5 +224,14 @@ public class Friday {
 
     private static void list() {
         Ui.printTaskList(taskList.list());
+    }
+
+    /**
+     * Finds and displays tasks matching the given keyword.
+     *
+     * @param keyword The keyword to search for.
+     */
+    private static void find(String keyword) {
+        Ui.printTaskList(taskList.find(keyword));
     }
 }
