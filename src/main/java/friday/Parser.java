@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Provides parsing utilities for user commands and task serialization.
+ */
 public class Parser {
 
     /**
@@ -14,7 +17,7 @@ public class Parser {
      */
     public static ParsedCommand parseCommand(String line) throws FridayException {
         if (line == null || line.trim().isBlank()) {
-            throw new FridayException(" Please enter a command.");
+            throw new FridayException("Please enter a command.");
         }
 
         String trimmed = line.trim();
@@ -41,7 +44,7 @@ public class Parser {
      */
     public static DeadlineArgs parseDeadlineArgs(String rest) throws FridayException {
         if (rest == null || rest.isBlank()) {
-            throw new FridayException(" A deadline needs a description.");
+            throw new FridayException("A deadline needs a description.");
         }
 
         int byIndex = rest.indexOf("/by");
@@ -75,7 +78,7 @@ public class Parser {
      */
     public static EventArgs parseEventArgs(String rest) throws FridayException {
         if (rest == null || rest.isBlank()) {
-            throw new FridayException(" An event needs a description.");
+            throw new FridayException("An event needs a description.");
         }
 
         int fromIndex = rest.indexOf("/from");
@@ -112,7 +115,7 @@ public class Parser {
      */
     public static int parseIndex(String s) throws FridayException {
         if (s == null || s.isBlank()) {
-            throw new FridayException(" Please provide a task number.");
+            throw new FridayException("Please provide a task number.");
         }
 
         try {
@@ -180,6 +183,9 @@ public class Parser {
     }
 
     // Inner static classes for parsed results
+    /**
+     * Represents a parsed command with command and arguments.
+     */
     public static class ParsedCommand {
         public final String command;
         public final String arguments;
@@ -190,6 +196,9 @@ public class Parser {
         }
     }
 
+    /**
+     * Represents parsed arguments for a deadline task.
+     */
     public static class DeadlineArgs {
         public final String description;
         public final LocalDate by;
@@ -200,6 +209,9 @@ public class Parser {
         }
     }
 
+    /**
+     * Represents parsed arguments for an event task.
+     */
     public static class EventArgs {
         public final String description;
         public final String from;

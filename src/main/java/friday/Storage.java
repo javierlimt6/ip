@@ -5,10 +5,19 @@ import java.nio.file.Files;
 import java.io.IOException;
 import java.io.BufferedWriter;
 
+/**
+ * Handles saving and loading tasks to/from a file.
+ */
 public class Storage {
     private final Path dataFile;
     private final TaskList taskList;
 
+    /**
+     * Constructs a Storage with the given data file and task list.
+     *
+     * @param dataFile The path to the data file.
+     * @param taskList The task list to save/load.
+     */
     public Storage(Path dataFile, TaskList taskList) {
         this.dataFile = dataFile;
         this.taskList = taskList;
@@ -77,11 +86,11 @@ public class Storage {
         int doneFlag = t.isDone() ? 1 : 0;
         // Format: TYPE | doneFlag | description | extra (extra omitted if blank except for Event delimiter form)
         if (type.equals("E")) {
-            return String.join(" | ", type, String.valueOf(doneFlag), t.desc, extra);
+            return String.join(" | ", type, String.valueOf(doneFlag), t.getDesc(), extra);
         }
         if (!extra.isBlank()) {
-            return String.join(" | ", type, String.valueOf(doneFlag), t.desc, extra);
+            return String.join(" | ", type, String.valueOf(doneFlag), t.getDesc(), extra);
         }
-        return String.join(" | ", type, String.valueOf(doneFlag), t.desc);
+        return String.join(" | ", type, String.valueOf(doneFlag), t.getDesc());
     }
 }

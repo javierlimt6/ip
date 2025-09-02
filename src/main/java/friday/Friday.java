@@ -1,16 +1,26 @@
 package friday;
 
-import java.nio.file.Path;
-import java.nio.file.Files;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * The main class for the Friday chatbot application.
+ * This class handles the CLI interface, command parsing, and task management.
+ */
 public class Friday {
     private static Path DATA_DIR;
     private static Path DATA_FILE;
     private static final TaskList taskList = new TaskList();
     private static Storage storage;
 
+    /**
+     * The main entry point of the application.
+     * Initializes storage, loads tasks, greets the user, and starts listening for commands.
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         initStorage();
         storage.load(); // load tasks from duke.txt if present
@@ -108,7 +118,8 @@ public class Friday {
                         delete(Parser.parseIndex(parsed.arguments));
                         break;
                     default:
-                        throw new FridayException(" I don't recognise that command. Try: todo, deadline, event, list, mark, unmark, delete, bye");
+                        throw new FridayException("I don't recognise that command. Try: todo, deadline, event, " +
+                                "list, mark, unmark, delete, bye");
                 }
             } catch (FridayException e) {
                 Ui.printError(e.getMessage());
