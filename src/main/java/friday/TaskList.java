@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.time.LocalDate;
 
 /**
- * Manages a list of tasks, providing methods to add, delete, mark, and list tasks.
+ * Manages a list of tasks, providing methods to add, delete, mark, and list
+ * tasks.
  */
 public class TaskList {
     private ArrayList<Task> tasks;
@@ -33,7 +34,7 @@ public class TaskList {
      * Adds a deadline task to the list.
      *
      * @param desc The description of the deadline.
-     * @param by The due date.
+     * @param by   The due date.
      * @throws FridayException If the description is null or blank.
      */
     public void addDeadline(String desc, LocalDate by) throws FridayException {
@@ -48,7 +49,7 @@ public class TaskList {
      *
      * @param desc The description of the event.
      * @param from The start time.
-     * @param to The end time.
+     * @param to   The end time.
      * @throws FridayException If the description is null or blank.
      */
     public void addEvent(String desc, String from, String to) throws FridayException {

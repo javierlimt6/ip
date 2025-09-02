@@ -27,7 +27,8 @@ public class Storage {
      * Saves the current tasks to the data file.
      */
     public void save() {
-        if (dataFile == null) return;
+        if (dataFile == null)
+            return;
         try {
             if (Files.notExists(dataFile.getParent())) {
                 Files.createDirectories(dataFile.getParent());
@@ -47,11 +48,13 @@ public class Storage {
      * Loads tasks from the data file into the task list.
      */
     public void load() {
-        if (dataFile == null || !Files.exists(dataFile)) return;
+        if (dataFile == null || !Files.exists(dataFile))
+            return;
         try {
             for (String line : Files.readAllLines(dataFile)) {
                 String trimmed = line.trim();
-                if (trimmed.isEmpty()) continue;
+                if (trimmed.isEmpty())
+                    continue;
                 Task t = Parser.parseSerializedTask(trimmed);
                 if (t != null) {
                     taskList.add(t);
@@ -84,7 +87,8 @@ public class Storage {
             type = "?"; // fallback
         }
         int doneFlag = t.isDone() ? 1 : 0;
-        // Format: TYPE | doneFlag | description | extra (extra omitted if blank except for Event delimiter form)
+        // Format: TYPE | doneFlag | description | extra (extra omitted if blank except
+        // for Event delimiter form)
         if (type.equals("E")) {
             return String.join(" | ", type, String.valueOf(doneFlag), t.getDesc(), extra);
         }

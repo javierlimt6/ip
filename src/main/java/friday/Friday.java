@@ -17,7 +17,8 @@ public class Friday {
 
     /**
      * The main entry point of the application.
-     * Initializes storage, loads tasks, greets the user, and starts listening for commands.
+     * Initializes storage, loads tasks, greets the user, and starts listening for
+     * commands.
      *
      * @param args Command line arguments (not used).
      */
@@ -45,8 +46,8 @@ public class Friday {
      * Strategy:
      * 1. If env FRIDAY_DATA_DIR set, use it.
      * 2. Walk up from current working directory; at each level check:
-     *      <level>/src/main/data
-     *      <level>/ip/src/main/data   (handles running from parent of ip)
+     * <level>/src/main/data
+     * <level>/ip/src/main/data (handles running from parent of ip)
      * 3. Fallback: currentWorkingDir/data
      */
     private static Path locateDataDir() {
@@ -70,8 +71,10 @@ public class Friday {
             cursor = cursor.getParent();
         }
 
-        // If not found, assume we are *inside* ip (or anywhere) and create ip/src/main/data relative if possible
-        // Try to detect an 'ip' directory downward from cwd (rare case) — otherwise fallback to ./data
+        // If not found, assume we are *inside* ip (or anywhere) and create
+        // ip/src/main/data relative if possible
+        // Try to detect an 'ip' directory downward from cwd (rare case) — otherwise
+        // fallback to ./data
         Path guessIp = cwd.resolve("ip").resolve("src").resolve("main").resolve("data");
         if (Files.exists(guessIp.getParent())) {
             return guessIp;
@@ -80,14 +83,13 @@ public class Friday {
     }
 
     private static void listen() {
-        listenLoop:
-        while (true) {
+        listenLoop: while (true) {
             Ui.printIndent();
             try {
                 String line = Ui.readLine();
-                Parser.ParsedCommand parsed = Parser.parseCommand(line); //factory method
+                Parser.ParsedCommand parsed = Parser.parseCommand(line); // factory method
 
-                if (parsed.command.isBlank()) { //no input
+                if (parsed.command.isBlank()) { // no input
                     Ui.printIndent();
                     continue;
                 }

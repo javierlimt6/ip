@@ -11,6 +11,7 @@ public class Parser {
 
     /**
      * Parses a user input line into command and arguments.
+     * 
      * @param line The full input line
      * @return A ParsedCommand object containing the command and arguments
      * @throws FridayException if the command is invalid
@@ -38,6 +39,7 @@ public class Parser {
 
     /**
      * Parses deadline arguments from the rest string.
+     * 
      * @param rest The arguments string (after "deadline ")
      * @return A DeadlineArgs object with description and date
      * @throws FridayException if parsing fails
@@ -72,6 +74,7 @@ public class Parser {
 
     /**
      * Parses event arguments from the rest string.
+     * 
      * @param rest The arguments string (after "event ")
      * @return An EventArgs object with description, from, and to
      * @throws FridayException if parsing fails
@@ -109,6 +112,7 @@ public class Parser {
 
     /**
      * Parses and validates a task index from string.
+     * 
      * @param s The string representation of the index
      * @return The validated index (1-based)
      * @throws FridayException if parsing or validation fails
@@ -131,6 +135,7 @@ public class Parser {
 
     /**
      * Parses a serialized task string into a Task object.
+     * 
      * @param line The serialized task string
      * @return The parsed Task object
      */
@@ -167,8 +172,10 @@ public class Parser {
                 if (parts.length >= 4) {
                     String extra = parts[3];
                     String[] ft = extra.split("\\s*\\|\\|\\s*", -1); // keep empty
-                    if (ft.length > 0) from = ft[0];
-                    if (ft.length > 1) to = ft[1];
+                    if (ft.length > 0)
+                        from = ft[0];
+                    if (ft.length > 1)
+                        to = ft[1];
                 }
                 t = new Event(desc, from, to);
                 break;

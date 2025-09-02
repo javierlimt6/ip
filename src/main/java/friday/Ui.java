@@ -3,10 +3,12 @@ package friday;
 import java.util.Scanner;
 
 /**
- * Handles user interface interactions, including printing messages and reading input.
+ * Handles user interface interactions, including printing messages and reading
+ * input.
  */
 public class Ui {
-    // the purpose of this class is to abstract the use of any System print calls into a Ui class
+    // the purpose of this class is to abstract the use of any System print calls
+    // into a Ui class
     private static final String IND = "____________________________________________________________";
     private static final Scanner in = new Scanner(System.in);
 
