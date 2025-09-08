@@ -34,6 +34,7 @@ application {
 shadowJar {
     archiveBaseName = "friday"
     archiveClassifier = null
+    archiveFileName = 'friday.jar'
 }
 sourceSets {
     main {
