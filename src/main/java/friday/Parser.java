@@ -169,13 +169,28 @@ public class Parser {
             case "E":
                 String from = "";
                 String to = "";
+                for (String s : parts) {
+                    System.out.println("part: " + s); // Keep for debugging
+                }
                 if (parts.length >= 4) {
-                    String extra = parts[3];
-                    String[] ft = extra.split("\\s*\\|\\|\\s*", -1); // keep empty
-                    if (ft.length > 0)
-                        from = ft[0];
-                    if (ft.length > 1)
-                        to = ft[1];
+                    from += parts[3];
+                    if (parts.length >= 6) {
+                        to += parts[5];
+                    }
+                    // System.out.println("Extra :" + extra);
+                    // For Event, extra is "from || to" (may or may not have spaces around ||)
+                    // String[] eventParts = extra.split("\\|\\|", -1); // Split on || without
+                    // requiring spaces
+                    // for (String s : eventParts) {
+                    // System.out.println(s); // Keep for debugging
+                    // }
+                    // if (eventParts.length >= 2) {
+                    // from = eventParts[0].trim();
+                    // to = eventParts[1].trim();
+                    // } else if (eventParts.length == 1) {
+                    // // Fallback: assume single part is 'to' if malformed
+                    // to = eventParts[0].trim();
+                    // }
                 }
                 t = new Event(desc, from, to);
                 break;
