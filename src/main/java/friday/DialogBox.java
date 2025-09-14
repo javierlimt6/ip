@@ -17,6 +17,28 @@ public class DialogBox extends HBox {
         if (i != null) {
             displayPicture.setImage(i);
         }
+        text.setWrapText(true);
+        displayPicture.setFitWidth(100.0);
+        displayPicture.setFitHeight(100.0);
+        this.setAlignment(Pos.TOP_RIGHT);
         this.getChildren().addAll(text, displayPicture);
+    }
+
+    public DialogBox(String s, Image i, boolean isUser) {
+        text = new Label(s);
+        displayPicture = new ImageView(i);
+        if (i != null) {
+            displayPicture.setImage(i);
+        }
+        text.setWrapText(true);
+        displayPicture.setFitWidth(100.0);
+        displayPicture.setFitHeight(100.0);
+        if (isUser) {
+            this.setAlignment(Pos.TOP_LEFT);
+            this.getChildren().addAll(displayPicture, text);
+        } else {
+            this.setAlignment(Pos.TOP_RIGHT);
+            this.getChildren().addAll(text, displayPicture);
+        }
     }
 }

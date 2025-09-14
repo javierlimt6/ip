@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -30,6 +31,8 @@ public class Friday extends Application {
     private TextField userInput;
     private Button sendButton;
     private Scene scene;
+    private Image userImage;
+    private Image fridayImage;
 
     /**
      * The main entry point of the application.
@@ -45,6 +48,10 @@ public class Friday extends Application {
     public void start(Stage stage) {
         initStorage();
         storage.load(); // load tasks from duke.txt if present
+
+        // Load images
+        userImage = new Image(this.getClass().getResourceAsStream("/images/user.png"));
+        fridayImage = new Image(this.getClass().getResourceAsStream("/images/friday.png"));
 
         // Setting up required components
         scrollPane = new ScrollPane();
@@ -103,29 +110,31 @@ public class Friday extends Application {
         });
 
         // Display greeting
-        addDialogMessage("Hello! I'm Friday\nWhat can I do for you?");
+        addDialogMessage("Hello! I'm Friday\nWhat can I do for you?", fridayImage, false);
     }
 
     /**
      * Helper method to add a message to the dialog container.
      *
      * @param message The message to display.
+     * @param image The image to display with the message.
+     * @param isUser Whether the message is from the user.
      */
-    private void addDialogMessage(String message) {
-        dialogContainer.getChildren().add(new DialogBox(message, null));
+    private void addDialogMessage(String message, Image image, boolean isUser) {
+        dialogContainer.getChildren().add(new DialogBox(message, image, isUser));
     }
 
     private void handleUserInput(String input) {
-        addDialogMessage(input); // User input
+        addDialogMessage(input, userImage, true); // User input
         try {
             Parser.ParsedCommand parsed = Parser.parseCommand(input);
             if (parsed.command.isBlank()) {
-                addDialogMessage("No input provided.");
+                addDialogMessage("No input provided.", fridayImage, false);
                 return;
             }
             switch (parsed.command) {
                 case "bye":
-                    addDialogMessage("Bye. Hope to see you again soon!");
+                    addDialogMessage("Bye. Hope to see you again soon!", fridayImage, false);
                     break;
                 case "list":
                     list();
@@ -156,7 +165,7 @@ public class Friday extends Application {
                             "list, mark, unmark, delete, find, bye");
             }
         } catch (FridayException e) {
-            addDialogMessage(e.getMessage());
+            addDialogMessage(e.getMessage(), fridayImage, false);
         }
     }
 
@@ -229,7 +238,7 @@ public class Friday extends Application {
         taskList.addTodo(desc);
         String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                 + "\nNow you have " + taskList.size() + " tasks in the list.";
-        addDialogMessage(message);
+        addDialogMessage(message, fridayImage, false);
         storage.save();
     }
 
@@ -245,7 +254,7 @@ public class Friday extends Application {
         storage.save();
         String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                 + "\nNow you have " + taskList.size() + " tasks in the list.";
-        addDialogMessage(message);
+        addDialogMessage(message, fridayImage, false);
     }
 
     /**
@@ -259,7 +268,7 @@ public class Friday extends Application {
         taskList.delete(idx);
         String message = "Noted. I've removed this task:\n  " + deletedTask.display() + "\nNow you have "
                 + taskList.size() + " tasks in the list.";
-        addDialogMessage(message);
+        addDialogMessage(message, fridayImage, false);
         storage.save();
     }
 
@@ -275,7 +284,7 @@ public class Friday extends Application {
         storage.save();
         String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                 + "\nNow you have " + taskList.size() + " tasks in the list.";
-        addDialogMessage(message);
+        addDialogMessage(message, fridayImage, false);
     }
 
     /**
@@ -287,10 +296,10 @@ public class Friday extends Application {
         try {
             taskList.mark(idx);
             String message = "Nice! I've marked this task as done:\n  " + taskList.get(idx - 1).display();
-            addDialogMessage(message);
+            addDialogMessage(message, fridayImage, false);
             storage.save();
         } catch (FridayException e) {
-            addDialogMessage(e.getMessage());
+            addDialogMessage(e.getMessage(), fridayImage, false);
         }
     }
 
@@ -303,16 +312,16 @@ public class Friday extends Application {
         try {
             taskList.unmark(idx);
             String message = "OK, I've marked this task as not done yet:\n  " + taskList.get(idx - 1).display();
-            addDialogMessage(message);
+            addDialogMessage(message, fridayImage, false);
             storage.save();
         } catch (FridayException e) {
-            addDialogMessage(e.getMessage());
+            addDialogMessage(e.getMessage(), fridayImage, false);
         }
     }
 
     private void list() {
         String message = taskList.list();
-        addDialogMessage(message);
+        addDialogMessage(message, fridayImage, false);
     }
 
     /**
@@ -322,6 +331,6 @@ public class Friday extends Application {
      */
     private void find(String keyword) {
         String message = taskList.find(keyword);
-        addDialogMessage(message);
+        addDialogMessage(message, fridayImage, false);
     }
 }
