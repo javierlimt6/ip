@@ -6,33 +6,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
- * The main class for the Friday chatbot application.
- * This class handles the GUI interface, command parsing, and task management.
+ * A GUI for Friday using FXML.
  */
 public class Friday extends Application {
     private Path DATA_DIR;
     private Path DATA_FILE;
     private TaskList taskList = new TaskList();
     private Storage storage;
-
-    private ScrollPane scrollPane;
-    private VBox dialogContainer;
-    private TextField userInput;
-    private Button sendButton;
-    private Scene scene;
-    private Image userImage;
-    private Image fridayImage;
 
     /**
      * The main entry point of the application.
@@ -49,123 +35,83 @@ public class Friday extends Application {
         initStorage();
         storage.load(); // load tasks from duke.txt if present
 
-        // Load images
-        userImage = new Image(this.getClass().getResourceAsStream("/images/user.png"));
-        fridayImage = new Image(this.getClass().getResourceAsStream("/images/friday.png"));
-
-        // Setting up required components
-        scrollPane = new ScrollPane();
-        dialogContainer = new VBox();
-        scrollPane.setContent(dialogContainer);
-
-        userInput = new TextField();
-        sendButton = new Button("Send");
-
-        AnchorPane mainLayout = new AnchorPane();
-        mainLayout.getChildren().addAll(scrollPane, userInput, sendButton);
-
-        scene = new Scene(mainLayout);
-
-        stage.setScene(scene);
-        stage.show();
-
-        // Set layout constraints
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Friday.class.getResource("/view/MainWindow.fxml"));
+            AnchorPane ap = fxmlLoader.load();
+            Scene scene = new Scene(ap);
+            stage.setScene(scene);
+            fxmlLoader.<MainWindow>getController().setFriday(this); // inject the Friday instance
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         stage.setTitle("Friday");
         stage.setResizable(false);
         stage.setMinHeight(600.0);
         stage.setMinWidth(400.0);
 
-        mainLayout.setPrefSize(400.0, 600.0);
-
-        scrollPane.setPrefSize(385, 535);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-
-        scrollPane.setVvalue(1.0);
-        scrollPane.setFitToWidth(true);
-
-        dialogContainer.setPrefHeight(Region.USE_COMPUTED_SIZE);
-
-        userInput.setPrefWidth(325.0);
-
-        sendButton.setPrefWidth(55.0);
-
-        AnchorPane.setTopAnchor(scrollPane, 1.0);
-
-        AnchorPane.setBottomAnchor(sendButton, 1.0);
-        AnchorPane.setRightAnchor(sendButton, 1.0);
-
-        AnchorPane.setLeftAnchor(userInput, 1.0);
-        AnchorPane.setBottomAnchor(userInput, 1.0);
-
-        // Add event handlers
-        sendButton.setOnMouseClicked((event) -> {
-            handleUserInput(userInput.getText());
-            userInput.clear();
-        });
-
-        userInput.setOnAction((event) -> {
-            handleUserInput(userInput.getText());
-            userInput.clear();
-        });
-
-        // Display greeting
-        addDialogMessage("Hello! I'm Friday\nWhat can I do for you?", fridayImage, false);
+        stage.show();
     }
 
     /**
-     * Helper method to add a message to the dialog container.
+     * Generates a response for the given command and returns it as a string.
+     * This method is called by MainWindow to get Friday's response to user input.
      *
-     * @param message The message to display.
-     * @param image   The image to display with the message.
-     * @param isUser  Whether the message is from the user.
+     * @param input The user's input command.
+     * @return Friday's response as a string.
      */
-    private void addDialogMessage(String message, Image image, boolean isUser) {
-        dialogContainer.getChildren().add(new DialogBox(message, image, isUser));
-    }
-
-    private void handleUserInput(String input) {
-        addDialogMessage(input, userImage, true); // User input
+    public String getResponse(String input) {
         try {
             Parser.ParsedCommand parsed = Parser.parseCommand(input);
             if (parsed.command.isBlank()) {
-                addDialogMessage("No input provided.", fridayImage, false);
-                return;
+                return "No input provided.";
             }
             switch (parsed.command) {
                 case "bye":
-                    addDialogMessage("Bye. Hope to see you again soon!", fridayImage, false);
-                    break;
+                    return "Bye. Hope to see you again soon!";
                 case "list":
-                    list();
-                    break;
+                    return taskList.list();
                 case "mark":
-                    mark(Parser.parseIndex(parsed.arguments));
-                    break;
+                    taskList.mark(Parser.parseIndex(parsed.arguments));
+                    storage.save();
+                    return "Nice! I've marked this task as done:\n  "
+                            + taskList.get(Parser.parseIndex(parsed.arguments) - 1).display();
                 case "unmark":
-                    unmark(Parser.parseIndex(parsed.arguments));
-                    break;
+                    taskList.unmark(Parser.parseIndex(parsed.arguments));
+                    storage.save();
+                    return "OK, I've marked this task as not done yet:\n  "
+                            + taskList.get(Parser.parseIndex(parsed.arguments) - 1).display();
                 case "todo":
-                    addTodo(parsed.arguments);
-                    break;
+                    taskList.addTodo(parsed.arguments);
+                    storage.save();
+                    return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
+                            + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "deadline":
-                    addDeadline(parsed.arguments);
-                    break;
+                    Parser.DeadlineArgs deadlineArgs = Parser.parseDeadlineArgs(parsed.arguments);
+                    taskList.addDeadline(deadlineArgs.description, deadlineArgs.by);
+                    storage.save();
+                    return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
+                            + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "event":
-                    addEvent(parsed.arguments);
-                    break;
+                    Parser.EventArgs eventArgs = Parser.parseEventArgs(parsed.arguments);
+                    taskList.addEvent(eventArgs.description, eventArgs.from, eventArgs.to);
+                    storage.save();
+                    return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
+                            + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "delete":
-                    delete(Parser.parseIndex(parsed.arguments));
-                    break;
+                    Task deletedTask = taskList.get(Parser.parseIndex(parsed.arguments) - 1);
+                    taskList.delete(Parser.parseIndex(parsed.arguments));
+                    storage.save();
+                    return "Noted. I've removed this task:\n  " + deletedTask.display() + "\nNow you have "
+                            + taskList.size() + " tasks in the list.";
                 case "find":
-                    find(parsed.arguments);
-                    break;
+                    return taskList.find(parsed.arguments);
                 default:
                     throw new FridayException("I don't recognise that command. Try: todo, deadline, event, " +
                             "list, mark, unmark, delete, find, bye");
             }
         } catch (FridayException e) {
-            addDialogMessage(e.getMessage(), fridayImage, false);
+            return e.getMessage();
         }
     }
 
@@ -226,111 +172,5 @@ public class Friday extends Application {
             return guessIp;
         }
         return cwd.resolve("data");
-    }
-
-    /**
-     * Adds a todo task to the list and saves the changes.
-     *
-     * @param desc The description of the todo.
-     * @throws FridayException If the description is invalid.
-     */
-    private void addTodo(String desc) throws FridayException {
-        taskList.addTodo(desc);
-        String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
-                + "\nNow you have " + taskList.size() + " tasks in the list.";
-        addDialogMessage(message, fridayImage, false);
-        storage.save();
-    }
-
-    /**
-     * Adds a deadline task to the list and saves the changes.
-     *
-     * @param rest The arguments string for the deadline.
-     * @throws FridayException If parsing or validation fails.
-     */
-    private void addDeadline(String rest) throws FridayException {
-        Parser.DeadlineArgs args = Parser.parseDeadlineArgs(rest);
-        taskList.addDeadline(args.description, args.by);
-        storage.save();
-        String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
-                + "\nNow you have " + taskList.size() + " tasks in the list.";
-        addDialogMessage(message, fridayImage, false);
-    }
-
-    /**
-     * Deletes a task from the list and saves the changes.
-     *
-     * @param idx The 1-based index of the task to delete.
-     * @throws FridayException If the index is invalid.
-     */
-    private void delete(int idx) throws FridayException {
-        Task deletedTask = taskList.get(idx - 1);
-        taskList.delete(idx);
-        String message = "Noted. I've removed this task:\n  " + deletedTask.display() + "\nNow you have "
-                + taskList.size() + " tasks in the list.";
-        addDialogMessage(message, fridayImage, false);
-        storage.save();
-    }
-
-    /**
-     * Adds an event task to the list and saves the changes.
-     *
-     * @param rest The arguments string for the event.
-     * @throws FridayException If parsing or validation fails.
-     */
-    private void addEvent(String rest) throws FridayException {
-        Parser.EventArgs args = Parser.parseEventArgs(rest);
-        taskList.addEvent(args.description, args.from, args.to);
-        storage.save();
-        String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
-                + "\nNow you have " + taskList.size() + " tasks in the list.";
-        addDialogMessage(message, fridayImage, false);
-    }
-
-    /**
-     * Marks a task as done and saves the changes.
-     *
-     * @param idx The 1-based index of the task to mark.
-     */
-    private void mark(int idx) {
-        try {
-            taskList.mark(idx);
-            String message = "Nice! I've marked this task as done:\n  " + taskList.get(idx - 1).display();
-            addDialogMessage(message, fridayImage, false);
-            storage.save();
-        } catch (FridayException e) {
-            addDialogMessage(e.getMessage(), fridayImage, false);
-        }
-    }
-
-    /**
-     * Marks a task as undone and saves the changes.
-     *
-     * @param idx The 1-based index of the task to unmark.
-     */
-    private void unmark(int idx) {
-        try {
-            taskList.unmark(idx);
-            String message = "OK, I've marked this task as not done yet:\n  " + taskList.get(idx - 1).display();
-            addDialogMessage(message, fridayImage, false);
-            storage.save();
-        } catch (FridayException e) {
-            addDialogMessage(e.getMessage(), fridayImage, false);
-        }
-    }
-
-    private void list() {
-        String message = taskList.list();
-        addDialogMessage(message, fridayImage, false);
-    }
-
-    /**
-     * Finds and displays tasks matching the given keyword.
-     *
-     * @param keyword The keyword to search for.
-     */
-    private void find(String keyword) {
-        String message = taskList.find(keyword);
-        addDialogMessage(message, fridayImage, false);
     }
 }
