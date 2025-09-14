@@ -103,20 +103,29 @@ public class Friday extends Application {
         });
 
         // Display greeting
-        dialogContainer.getChildren().add(new DialogBox("Hello! I'm Friday\nWhat can I do for you?", null));
+        addDialogMessage("Hello! I'm Friday\nWhat can I do for you?");
+    }
+
+    /**
+     * Helper method to add a message to the dialog container.
+     *
+     * @param message The message to display.
+     */
+    private void addDialogMessage(String message) {
+        dialogContainer.getChildren().add(new DialogBox(message, null));
     }
 
     private void handleUserInput(String input) {
-        dialogContainer.getChildren().add(new DialogBox(input, null)); // User input
+        addDialogMessage(input); // User input
         try {
             Parser.ParsedCommand parsed = Parser.parseCommand(input);
             if (parsed.command.isBlank()) {
-                dialogContainer.getChildren().add(new DialogBox("No input provided.", null));
+                addDialogMessage("No input provided.");
                 return;
             }
             switch (parsed.command) {
                 case "bye":
-                    dialogContainer.getChildren().add(new DialogBox("Bye. Hope to see you again soon!", null));
+                    addDialogMessage("Bye. Hope to see you again soon!");
                     break;
                 case "list":
                     list();
@@ -147,7 +156,7 @@ public class Friday extends Application {
                             "list, mark, unmark, delete, find, bye");
             }
         } catch (FridayException e) {
-            dialogContainer.getChildren().add(new DialogBox(e.getMessage(), null));
+            addDialogMessage(e.getMessage());
         }
     }
 
@@ -220,7 +229,7 @@ public class Friday extends Application {
         taskList.addTodo(desc);
         String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                 + "\nNow you have " + taskList.size() + " tasks in the list.";
-        dialogContainer.getChildren().add(new DialogBox(message, null));
+        addDialogMessage(message);
         storage.save();
     }
 
@@ -236,7 +245,7 @@ public class Friday extends Application {
         storage.save();
         String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                 + "\nNow you have " + taskList.size() + " tasks in the list.";
-        dialogContainer.getChildren().add(new DialogBox(message, null));
+        addDialogMessage(message);
     }
 
     /**
@@ -250,7 +259,7 @@ public class Friday extends Application {
         taskList.delete(idx);
         String message = "Noted. I've removed this task:\n  " + deletedTask.display() + "\nNow you have "
                 + taskList.size() + " tasks in the list.";
-        dialogContainer.getChildren().add(new DialogBox(message, null));
+        addDialogMessage(message);
         storage.save();
     }
 
@@ -266,7 +275,7 @@ public class Friday extends Application {
         storage.save();
         String message = "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                 + "\nNow you have " + taskList.size() + " tasks in the list.";
-        dialogContainer.getChildren().add(new DialogBox(message, null));
+        addDialogMessage(message);
     }
 
     /**
@@ -278,10 +287,10 @@ public class Friday extends Application {
         try {
             taskList.mark(idx);
             String message = "Nice! I've marked this task as done:\n  " + taskList.get(idx - 1).display();
-            dialogContainer.getChildren().add(new DialogBox(message, null));
+            addDialogMessage(message);
             storage.save();
         } catch (FridayException e) {
-            dialogContainer.getChildren().add(new DialogBox(e.getMessage(), null));
+            addDialogMessage(e.getMessage());
         }
     }
 
@@ -294,16 +303,16 @@ public class Friday extends Application {
         try {
             taskList.unmark(idx);
             String message = "OK, I've marked this task as not done yet:\n  " + taskList.get(idx - 1).display();
-            dialogContainer.getChildren().add(new DialogBox(message, null));
+            addDialogMessage(message);
             storage.save();
         } catch (FridayException e) {
-            dialogContainer.getChildren().add(new DialogBox(e.getMessage(), null));
+            addDialogMessage(e.getMessage());
         }
     }
 
     private void list() {
         String message = taskList.list();
-        dialogContainer.getChildren().add(new DialogBox(message, null));
+        addDialogMessage(message);
     }
 
     /**
@@ -313,6 +322,6 @@ public class Friday extends Application {
      */
     private void find(String keyword) {
         String message = taskList.find(keyword);
-        dialogContainer.getChildren().add(new DialogBox(message, null));
+        addDialogMessage(message);
     }
 }
