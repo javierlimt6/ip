@@ -117,8 +117,8 @@ public class Friday extends Application {
      * Helper method to add a message to the dialog container.
      *
      * @param message The message to display.
-     * @param image The image to display with the message.
-     * @param isUser Whether the message is from the user.
+     * @param image   The image to display with the message.
+     * @param isUser  Whether the message is from the user.
      */
     private void addDialogMessage(String message, Image image, boolean isUser) {
         dialogContainer.getChildren().add(new DialogBox(message, image, isUser));

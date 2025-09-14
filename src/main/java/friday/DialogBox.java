@@ -33,7 +33,7 @@ public class DialogBox extends HBox {
         text.setWrapText(true);
         displayPicture.setFitWidth(100.0);
         displayPicture.setFitHeight(100.0);
-        if (isUser) {
+        if (!isUser) {
             this.setAlignment(Pos.TOP_LEFT);
             this.getChildren().addAll(displayPicture, text);
         } else {
