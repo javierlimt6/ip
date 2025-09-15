@@ -40,9 +40,9 @@ public class TaskListTest {
     public void testMark() throws FridayException {
         TaskList taskList = new TaskList();
         taskList.addTodo("Test task");
-        assertFalse(taskList.get(0).isDone());
+        assertFalse(taskList.get(0).checkDone());
         taskList.mark(1);
-        assertTrue(taskList.get(0).isDone());
+        assertTrue(taskList.get(0).checkDone());
     }
 
     @Test

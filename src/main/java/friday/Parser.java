@@ -171,55 +171,7 @@ public class Parser {
         assert type != null : "Task type should not be null";
         assert desc != null : "Task description should not be null";
 
-        Task t = null;
-        switch (type) {
-            case "T":
-                t = new ToDo(desc);
-                break;
-            case "D":
-                LocalDate by = null;
-                if (parts.length >= 4 && !parts[3].isBlank()) {
-                    try {
-                        by = LocalDate.parse(parts[3], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                        assert by != null : "Parsed deadline date should not be null";
-                    } catch (DateTimeParseException e) {
-                        // Skip if date invalid
-                        return null;
-                    }
-                }
-                t = new Deadline(desc, by);
-                break;
-            case "E":
-                String from = "";
-                String to = "";
-                for (String s : parts) {
-                    System.out.println("part: " + s); // Keep for debugging
-                }
-                if (parts.length >= 4) {
-                    from += parts[3];
-                    if (parts.length >= 6) {
-                        to += parts[5];
-                    }
-                    // System.out.println("Extra :" + extra);
-                    // For Event, extra is "from || to" (may or may not have spaces around ||)
-                    // String[] eventParts = extra.split("\\|\\|", -1); // Split on || without
-                    // requiring spaces
-                    // for (String s : eventParts) {
-                    // System.out.println(s); // Keep for debugging
-                    // }
-                    // if (eventParts.length >= 2) {
-                    // from = eventParts[0].trim();
-                    // to = eventParts[1].trim();
-                    // } else if (eventParts.length == 1) {
-                    // // Fallback: assume single part is 'to' if malformed
-                    // to = eventParts[0].trim();
-                    // }
-                }
-                t = new Event(desc, from, to);
-                break;
-            default:
-                return null; // unknown type
-        }
+        Task t = createTaskByType(type, desc, parts);
 
         if (t != null && done) {
             t.markDone();
@@ -227,6 +179,70 @@ public class Parser {
 
         assert t == null || t.getDesc().equals(desc) : "Created task should have the correct description";
         return t;
+    }
+
+    /**
+     * Creates a task object based on the task type and parsed parts.
+     * 
+     * @param type  The task type identifier
+     * @param desc  The task description
+     * @param parts The split serialized data parts
+     * @return The created Task object or null if type is unknown
+     */
+    private static Task createTaskByType(String type, String desc, String[] parts) {
+        switch (type) {
+            case "T":
+                assert type.equals(TaskType.TODO.shortName()) : "Type should match TODO constant";
+                return new ToDo(desc);
+            case "D":
+                assert type.equals(TaskType.DEADLINE.shortName()) : "Type should match DEADLINE constant";
+                return parseDeadlineTask(desc, parts);
+            case "E":
+                assert type.equals(TaskType.EVENT.shortName()) : "Type should match EVENT constant";
+                return parseEventTask(desc, parts);
+            default:
+                return null; // unknown type
+        }
+    }
+
+    /**
+     * Parses deadline-specific data from serialized parts.
+     * 
+     * @param desc  The task description
+     * @param parts The split serialized data parts
+     * @return A Deadline task object
+     */
+    private static Deadline parseDeadlineTask(String desc, String[] parts) {
+        LocalDate by = null;
+        if (parts.length >= 4 && !parts[3].isBlank()) {
+            try {
+                by = LocalDate.parse(parts[3], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                assert by != null : "Parsed deadline date should not be null";
+            } catch (DateTimeParseException e) {
+                // Skip if date invalid
+                return null;
+            }
+        }
+        return new Deadline(desc, by);
+    }
+
+    /**
+     * Parses event-specific data from serialized parts.
+     * 
+     * @param desc  The task description
+     * @param parts The split serialized data parts
+     * @return An Event task object
+     */
+    private static Event parseEventTask(String desc, String[] parts) {
+        String from = "";
+        String to = "";
+        if (parts.length >= 4) {
+            from += parts[3];
+            if (parts.length >= 6) {
+                to += parts[5];
+            }
+        }
+        return new Event(desc, from, to);
     }
 
     // Inner static classes for parsed results
