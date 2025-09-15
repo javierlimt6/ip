@@ -18,7 +18,11 @@ public class Deadline extends Task {
      */
     public Deadline(String desc, LocalDate by) {
         super(desc);
+        assert desc != null : "Description should not be null (validated by parent constructor)";
+
         this.by = by;
+
+        assert this.by == by : "Due date should be correctly assigned";
     }
 
     /**

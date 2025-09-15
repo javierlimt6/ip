@@ -27,7 +27,14 @@ public class TaskList {
         if (desc == null || desc.isBlank()) {
             throw new FridayException("A todo needs a description.");
         }
+        
+        assert desc != null && !desc.isBlank() : "Description should be valid after validation";
+        int sizeBefore = tasks.size();
+        
         tasks.add(new ToDo(desc));
+        
+        assert tasks.size() == sizeBefore + 1 : "Task list size should increase by 1 after adding";
+        assert tasks.get(tasks.size() - 1) instanceof ToDo : "Last added task should be a ToDo";
     }
 
     /**
@@ -41,7 +48,14 @@ public class TaskList {
         if (desc == null || desc.isBlank()) {
             throw new FridayException("A deadline needs a description.");
         }
+        
+        assert desc != null && !desc.isBlank() : "Description should be valid after validation";
+        int sizeBefore = tasks.size();
+        
         tasks.add(new Deadline(desc, by));
+        
+        assert tasks.size() == sizeBefore + 1 : "Task list size should increase by 1 after adding";
+        assert tasks.get(tasks.size() - 1) instanceof Deadline : "Last added task should be a Deadline";
     }
 
     /**
@@ -67,7 +81,14 @@ public class TaskList {
      */
     public void delete(int idx) throws FridayException {
         if (idx >= 1 && idx <= tasks.size()) {
+            assert idx >= 1 && idx <= tasks.size() : "Index should be valid before deletion";
+            int sizeBefore = tasks.size();
+            Task removedTask = tasks.get(idx - 1);
+            
             tasks.remove(idx - 1);
+            
+            assert tasks.size() == sizeBefore - 1 : "Task list size should decrease by 1 after deletion";
+            assert !tasks.contains(removedTask) : "Removed task should no longer be in the list";
         } else {
             throw new FridayException("That task number doesn't exist.");
         }
@@ -81,7 +102,12 @@ public class TaskList {
      */
     public void mark(int idx) throws FridayException {
         if (idx >= 1 && idx <= tasks.size()) {
-            tasks.get(idx - 1).markDone();
+            assert idx >= 1 && idx <= tasks.size() : "Index should be valid before marking";
+            Task task = tasks.get(idx - 1);
+            
+            task.markDone();
+            
+            assert task.isDone() : "Task should be marked as done after marking";
         } else {
             throw new FridayException("That task number doesn't exist.");
         }
@@ -95,7 +121,12 @@ public class TaskList {
      */
     public void unmark(int idx) throws FridayException {
         if (idx >= 1 && idx <= tasks.size()) {
-            tasks.get(idx - 1).markUndone();
+            assert idx >= 1 && idx <= tasks.size() : "Index should be valid before unmarking";
+            Task task = tasks.get(idx - 1);
+            
+            task.markUndone();
+            
+            assert !task.isDone() : "Task should be marked as undone after unmarking";
         } else {
             throw new FridayException("That task number doesn't exist.");
         }
@@ -143,7 +174,12 @@ public class TaskList {
      * @return The task at the index.
      */
     public Task get(int idx) {
-        return tasks.get(idx);
+        assert idx >= 0 && idx < tasks.size() : "Index should be within bounds for 0-based access";
+        
+        Task task = tasks.get(idx);
+        
+        assert task != null : "Retrieved task should not be null";
+        return task;
     }
 
     /**
@@ -152,7 +188,13 @@ public class TaskList {
      * @param t The task to add.
      */
     public void add(Task t) {
+        assert t != null : "Task to add should not be null";
+        int sizeBefore = tasks.size();
+        
         tasks.add(t);
+        
+        assert tasks.size() == sizeBefore + 1 : "Task list size should increase by 1 after adding";
+        assert tasks.contains(t) : "Added task should be in the list";
     }
 
     /**

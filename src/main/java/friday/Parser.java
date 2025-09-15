@@ -22,6 +22,8 @@ public class Parser {
         }
 
         String trimmed = line.trim();
+        assert trimmed.length() > 0 : "Trimmed line should not be empty after null/blank check";
+        
         int spaceIndex = trimmed.indexOf(' ');
         String cmd;
         String rest;
@@ -34,6 +36,9 @@ public class Parser {
             rest = trimmed.substring(spaceIndex + 1).trim();
         }
 
+        assert cmd != null && !cmd.isEmpty() : "Command should not be null or empty";
+        assert rest != null : "Rest should not be null (can be empty)";
+        
         return new ParsedCommand(cmd, rest);
     }
 
@@ -49,6 +54,8 @@ public class Parser {
             throw new FridayException("A deadline needs a description.");
         }
 
+        assert rest.trim().length() > 0 : "Rest should have content after null/blank check";
+        
         int byIndex = rest.indexOf("/by");
         String desc;
         String byStr = "";
@@ -60,10 +67,14 @@ public class Parser {
             desc = rest;
         }
 
+        assert desc != null : "Description should not be null";
+        assert byStr != null : "By string should not be null (can be empty)";
+
         LocalDate by = null;
         if (!byStr.isBlank()) {
             try {
                 by = LocalDate.parse(byStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                assert by != null : "Parsed date should not be null when parsing succeeds";
             } catch (DateTimeParseException e) {
                 throw new FridayException(" Invalid date format. Use yyyy-MM-dd (e.g., 2025-10-15).");
             }
@@ -122,11 +133,15 @@ public class Parser {
             throw new FridayException("Please provide a task number.");
         }
 
+        assert s.trim().length() > 0 : "String should have content after null/blank check";
+
         try {
             int idx = Integer.parseInt(s.trim());
             if (idx < 1) {
                 throw new FridayException(" Task number must be 1 or greater.");
             }
+            
+            assert idx >= 1 : "Validated index should be 1 or greater";
             return idx;
         } catch (NumberFormatException e) {
             throw new FridayException(" '" + s + "' is not a valid task number.");
@@ -140,14 +155,21 @@ public class Parser {
      * @return The parsed Task object
      */
     public static Task parseSerializedTask(String line) {
+        assert line != null : "Input line should not be null";
+        
         String[] parts = line.split("\\s*\\|\\s*");
         if (parts.length < 3) {
             return null; // malformed; skip
         }
 
+        assert parts.length >= 3 : "Parts array should have at least 3 elements";
+        
         String type = parts[0];
         boolean done = "1".equals(parts[1]);
         String desc = parts[2];
+
+        assert type != null : "Task type should not be null";
+        assert desc != null : "Task description should not be null";
 
         Task t = null;
         switch (type) {
@@ -159,6 +181,7 @@ public class Parser {
                 if (parts.length >= 4 && !parts[3].isBlank()) {
                     try {
                         by = LocalDate.parse(parts[3], DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                        assert by != null : "Parsed deadline date should not be null";
                     } catch (DateTimeParseException e) {
                         // Skip if date invalid
                         return null;
@@ -201,6 +224,8 @@ public class Parser {
         if (t != null && done) {
             t.markDone();
         }
+        
+        assert t == null || t.getDesc().equals(desc) : "Created task should have the correct description";
         return t;
     }
 

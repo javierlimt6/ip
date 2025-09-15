@@ -61,51 +61,78 @@ public class Friday extends Application {
      * @return Friday's response as a string.
      */
     public String getResponse(String input) {
+        assert input != null : "Input should not be null";
+        assert taskList != null : "Task list should be initialized";
+        assert storage != null : "Storage should be initialized";
+        
         try {
             Parser.ParsedCommand parsed = Parser.parseCommand(input);
+            assert parsed != null : "Parsed command should not be null";
+            assert parsed.command != null : "Parsed command should have a command";
+            
             if (parsed.command.isBlank()) {
                 return "No input provided.";
             }
+            
+            int initialTaskCount = taskList.size();
+            
             switch (parsed.command) {
                 case "bye":
                     return "Bye. Hope to see you again soon!";
                 case "list":
-                    return taskList.list();
+                    String listResult = taskList.list();
+                    assert listResult != null : "List result should not be null";
+                    return listResult;
                 case "mark":
-                    taskList.mark(Parser.parseIndex(parsed.arguments));
+                    int markIndex = Parser.parseIndex(parsed.arguments);
+                    assert markIndex >= 1 : "Mark index should be 1 or greater";
+                    taskList.mark(markIndex);
                     storage.save();
                     return "Nice! I've marked this task as done:\n  "
-                            + taskList.get(Parser.parseIndex(parsed.arguments) - 1).display();
+                            + taskList.get(markIndex - 1).display();
                 case "unmark":
-                    taskList.unmark(Parser.parseIndex(parsed.arguments));
+                    int unmarkIndex = Parser.parseIndex(parsed.arguments);
+                    assert unmarkIndex >= 1 : "Unmark index should be 1 or greater";
+                    taskList.unmark(unmarkIndex);
                     storage.save();
                     return "OK, I've marked this task as not done yet:\n  "
-                            + taskList.get(Parser.parseIndex(parsed.arguments) - 1).display();
+                            + taskList.get(unmarkIndex - 1).display();
                 case "todo":
                     taskList.addTodo(parsed.arguments);
                     storage.save();
+                    assert taskList.size() == initialTaskCount + 1 : "Task count should increase by 1 after adding todo";
                     return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                             + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "deadline":
                     Parser.DeadlineArgs deadlineArgs = Parser.parseDeadlineArgs(parsed.arguments);
+                    assert deadlineArgs != null : "Deadline args should not be null";
                     taskList.addDeadline(deadlineArgs.description, deadlineArgs.by);
                     storage.save();
+                    assert taskList.size() == initialTaskCount + 1 : "Task count should increase by 1 after adding deadline";
                     return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                             + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "event":
                     Parser.EventArgs eventArgs = Parser.parseEventArgs(parsed.arguments);
+                    assert eventArgs != null : "Event args should not be null";
                     taskList.addEvent(eventArgs.description, eventArgs.from, eventArgs.to);
                     storage.save();
+                    assert taskList.size() == initialTaskCount + 1 : "Task count should increase by 1 after adding event";
                     return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                             + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "delete":
-                    Task deletedTask = taskList.get(Parser.parseIndex(parsed.arguments) - 1);
-                    taskList.delete(Parser.parseIndex(parsed.arguments));
+                    int deleteIndex = Parser.parseIndex(parsed.arguments);
+                    assert deleteIndex >= 1 : "Delete index should be 1 or greater";
+                    Task deletedTask = taskList.get(deleteIndex - 1);
+                    assert deletedTask != null : "Task to delete should exist";
+                    taskList.delete(deleteIndex);
                     storage.save();
+                    assert taskList.size() == initialTaskCount - 1 : "Task count should decrease by 1 after deletion";
                     return "Noted. I've removed this task:\n  " + deletedTask.display() + "\nNow you have "
                             + taskList.size() + " tasks in the list.";
                 case "find":
-                    return taskList.find(parsed.arguments);
+                    String findResult = taskList.find(parsed.arguments);
+                    assert findResult != null : "Find result should not be null";
+                    return findResult;
                 default:
                     throw new FridayException("I don't recognise that command. Try: todo, deadline, event, " +
                             "list, mark, unmark, delete, find, bye");

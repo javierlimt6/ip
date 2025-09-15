@@ -9,3 +9,4 @@ T | 0 | another
 T | 0 | test
 E | 1 | make unit tests | 9pm || 11pm
 E | 0 | Meeting | 10am || 12pm
+T | 0 | A-CodeQuality

@@ -13,7 +13,12 @@ public abstract class Task {
      * @param desc The description of the task.
      */
     public Task(String desc) {
+        assert desc != null : "Task description should not be null";
+        
         this.desc = desc;
+        
+        assert this.desc == desc : "Task description should be correctly assigned";
+        assert !this.done : "New task should not be marked as done initially";
     }
 
     /**
@@ -30,6 +35,8 @@ public abstract class Task {
      */
     public void markDone() {
         done = true;
+        
+        assert done : "Task should be marked as done after calling markDone()";
     }
 
     /**
@@ -37,6 +44,8 @@ public abstract class Task {
      */
     public void markUndone() {
         done = false;
+        
+        assert !done : "Task should be marked as undone after calling markUndone()";
     }
 
     /**
