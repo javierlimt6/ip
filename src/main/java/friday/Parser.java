@@ -23,7 +23,7 @@ public class Parser {
 
         String trimmed = line.trim();
         assert trimmed.length() > 0 : "Trimmed line should not be empty after null/blank check";
-        
+
         int spaceIndex = trimmed.indexOf(' ');
         String cmd;
         String rest;
@@ -38,7 +38,7 @@ public class Parser {
 
         assert cmd != null && !cmd.isEmpty() : "Command should not be null or empty";
         assert rest != null : "Rest should not be null (can be empty)";
-        
+
         return new ParsedCommand(cmd, rest);
     }
 
@@ -55,7 +55,7 @@ public class Parser {
         }
 
         assert rest.trim().length() > 0 : "Rest should have content after null/blank check";
-        
+
         int byIndex = rest.indexOf("/by");
         String desc;
         String byStr = "";
@@ -140,7 +140,7 @@ public class Parser {
             if (idx < 1) {
                 throw new FridayException(" Task number must be 1 or greater.");
             }
-            
+
             assert idx >= 1 : "Validated index should be 1 or greater";
             return idx;
         } catch (NumberFormatException e) {
@@ -156,14 +156,14 @@ public class Parser {
      */
     public static Task parseSerializedTask(String line) {
         assert line != null : "Input line should not be null";
-        
+
         String[] parts = line.split("\\s*\\|\\s*");
         if (parts.length < 3) {
             return null; // malformed; skip
         }
 
         assert parts.length >= 3 : "Parts array should have at least 3 elements";
-        
+
         String type = parts[0];
         boolean done = "1".equals(parts[1]);
         String desc = parts[2];
@@ -224,7 +224,7 @@ public class Parser {
         if (t != null && done) {
             t.markDone();
         }
-        
+
         assert t == null || t.getDesc().equals(desc) : "Created task should have the correct description";
         return t;
     }

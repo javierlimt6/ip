@@ -21,10 +21,10 @@ public class Storage {
     public Storage(Path dataFile, TaskList taskList) {
         assert dataFile != null : "Data file path should not be null";
         assert taskList != null : "Task list should not be null";
-        
+
         this.dataFile = dataFile;
         this.taskList = taskList;
-        
+
         assert this.dataFile == dataFile : "Data file should be correctly assigned";
         assert this.taskList == taskList : "Task list should be correctly assigned";
     }
@@ -56,20 +56,20 @@ public class Storage {
     public void load() {
         if (dataFile == null || !Files.exists(dataFile))
             return;
-            
+
         assert dataFile != null : "Data file should not be null when loading";
         assert Files.exists(dataFile) : "Data file should exist when loading";
-        
+
         int initialSize = taskList.size();
-        
+
         try {
             for (String line : Files.readAllLines(dataFile)) {
                 String trimmed = line.trim();
                 if (trimmed.isEmpty())
                     continue;
-                    
+
                 assert trimmed.length() > 0 : "Trimmed line should not be empty";
-                
+
                 Task t = Parser.parseSerializedTask(trimmed);
                 if (t != null) {
                     taskList.add(t);
@@ -78,7 +78,7 @@ public class Storage {
         } catch (IOException e) {
             Ui.printWarning("Could not load tasks: " + e.getMessage());
         }
-        
+
         assert taskList.size() >= initialSize : "Task list size should not decrease after loading";
     }
 
@@ -91,7 +91,7 @@ public class Storage {
     private String serialize(Task t) {
         assert t != null : "Task to serialize should not be null";
         assert t.getDesc() != null : "Task description should not be null";
-        
+
         String type;
         String extra = "";
         if (t instanceof ToDo) {
@@ -109,24 +109,27 @@ public class Storage {
         } else {
             type = "?"; // fallback
         }
-        
+
         assert type != null && !type.isEmpty() : "Task type should be determined";
-        
+
         int doneFlag = t.isDone() ? 1 : 0;
         // Format: TYPE | doneFlag | description | extra (extra omitted if blank except
         // for Event delimiter form)
         if (type.equals("E")) {
             String result = String.join(" | ", type, String.valueOf(doneFlag), t.getDesc(), extra);
-            assert result.contains(type) && result.contains(t.getDesc()) : "Serialized string should contain type and description";
+            assert result.contains(type) && result.contains(t.getDesc())
+                    : "Serialized string should contain type and description";
             return result;
         }
         if (!extra.isBlank()) {
             String result = String.join(" | ", type, String.valueOf(doneFlag), t.getDesc(), extra);
-            assert result.contains(type) && result.contains(t.getDesc()) : "Serialized string should contain type and description";
+            assert result.contains(type) && result.contains(t.getDesc())
+                    : "Serialized string should contain type and description";
             return result;
         }
         String result = String.join(" | ", type, String.valueOf(doneFlag), t.getDesc());
-        assert result.contains(type) && result.contains(t.getDesc()) : "Serialized string should contain type and description";
+        assert result.contains(type) && result.contains(t.getDesc())
+                : "Serialized string should contain type and description";
         return result;
     }
 }

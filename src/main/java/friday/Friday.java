@@ -64,18 +64,18 @@ public class Friday extends Application {
         assert input != null : "Input should not be null";
         assert taskList != null : "Task list should be initialized";
         assert storage != null : "Storage should be initialized";
-        
+
         try {
             Parser.ParsedCommand parsed = Parser.parseCommand(input);
             assert parsed != null : "Parsed command should not be null";
             assert parsed.command != null : "Parsed command should have a command";
-            
+
             if (parsed.command.isBlank()) {
                 return "No input provided.";
             }
-            
+
             int initialTaskCount = taskList.size();
-            
+
             switch (parsed.command) {
                 case "bye":
                     return "Bye. Hope to see you again soon!";
@@ -100,7 +100,8 @@ public class Friday extends Application {
                 case "todo":
                     taskList.addTodo(parsed.arguments);
                     storage.save();
-                    assert taskList.size() == initialTaskCount + 1 : "Task count should increase by 1 after adding todo";
+                    assert taskList.size() == initialTaskCount + 1
+                            : "Task count should increase by 1 after adding todo";
                     return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                             + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "deadline":
@@ -108,7 +109,8 @@ public class Friday extends Application {
                     assert deadlineArgs != null : "Deadline args should not be null";
                     taskList.addDeadline(deadlineArgs.description, deadlineArgs.by);
                     storage.save();
-                    assert taskList.size() == initialTaskCount + 1 : "Task count should increase by 1 after adding deadline";
+                    assert taskList.size() == initialTaskCount + 1
+                            : "Task count should increase by 1 after adding deadline";
                     return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                             + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "event":
@@ -116,7 +118,8 @@ public class Friday extends Application {
                     assert eventArgs != null : "Event args should not be null";
                     taskList.addEvent(eventArgs.description, eventArgs.from, eventArgs.to);
                     storage.save();
-                    assert taskList.size() == initialTaskCount + 1 : "Task count should increase by 1 after adding event";
+                    assert taskList.size() == initialTaskCount + 1
+                            : "Task count should increase by 1 after adding event";
                     return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
                             + "\nNow you have " + taskList.size() + " tasks in the list.";
                 case "delete":
