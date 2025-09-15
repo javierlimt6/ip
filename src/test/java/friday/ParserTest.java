@@ -40,7 +40,7 @@ public class ParserTest {
         assertNotNull(task);
         assertTrue(task instanceof ToDo);
         assertEquals("Read book", task.getDesc());
-        assertFalse(task.isDone());
+        assertFalse(task.checkDone());
     }
 
     @Test
@@ -49,7 +49,7 @@ public class ParserTest {
         assertNotNull(task);
         assertTrue(task instanceof ToDo);
         assertEquals("Read book", task.getDesc());
-        assertTrue(task.isDone());
+        assertTrue(task.checkDone());
     }
 
     @Test

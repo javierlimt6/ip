@@ -8,26 +8,26 @@ public class TaskTest {
     @Test
     public void testMarkDone() {
         Task task = new ToDo("Test task");
-        assertFalse(task.isDone());
+        assertFalse(task.checkDone());
         task.markDone();
-        assertTrue(task.isDone());
+        assertTrue(task.checkDone());
     }
 
     @Test
     public void testMarkUndone() {
         Task task = new ToDo("Test task");
         task.markDone();
-        assertTrue(task.isDone());
+        assertTrue(task.checkDone());
         task.markUndone();
-        assertFalse(task.isDone());
+        assertFalse(task.checkDone());
     }
 
     @Test
-    public void testIsDone() {
+    public void testCheckDone() {
         Task task = new ToDo("Test task");
-        assertFalse(task.isDone());
+        assertFalse(task.checkDone());
         task.markDone();
-        assertTrue(task.isDone());
+        assertTrue(task.checkDone());
     }
 
     @Test

@@ -4,7 +4,7 @@ package friday;
  * Represents an abstract task with a description and completion status.
  */
 public abstract class Task {
-    private boolean done;
+    private boolean isDone;
     private String desc;
 
     /**
@@ -18,7 +18,7 @@ public abstract class Task {
         this.desc = desc;
 
         assert this.desc == desc : "Task description should be correctly assigned";
-        assert !this.done : "New task should not be marked as done initially";
+        assert !this.isDone : "New task should not be marked as done initially";
     }
 
     /**
@@ -34,18 +34,18 @@ public abstract class Task {
      * Marks the task as done.
      */
     public void markDone() {
-        done = true;
+        isDone = true;
 
-        assert done : "Task should be marked as done after calling markDone()";
+        assert isDone : "Task should be marked as done after calling markDone()";
     }
 
     /**
      * Marks the task as undone.
      */
     public void markUndone() {
-        done = false;
+        isDone = false;
 
-        assert !done : "Task should be marked as undone after calling markUndone()";
+        assert !isDone : "Task should be marked as undone after calling markUndone()";
     }
 
     /**
@@ -53,8 +53,8 @@ public abstract class Task {
      *
      * @return True if the task is done, false otherwise.
      */
-    public boolean isDone() {
-        return done;
+    public boolean checkDone() {
+        return isDone;
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class Task {
      * @return The status box string.
      */
     public String statusBox() {
-        return "[" + (done ? "X" : " ") + "]";
+        return "[" + (isDone ? "X" : " ") + "]";
     }
 
     /**

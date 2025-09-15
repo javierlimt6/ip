@@ -107,7 +107,7 @@ public class TaskList {
 
             task.markDone();
 
-            assert task.isDone() : "Task should be marked as done after marking";
+            assert task.checkDone() : "Task should be marked as done after marking";
         } else {
             throw new FridayException("That task number doesn't exist.");
         }
@@ -126,7 +126,7 @@ public class TaskList {
 
             task.markUndone();
 
-            assert !task.isDone() : "Task should be marked as undone after unmarking";
+            assert !task.checkDone() : "Task should be marked as undone after unmarking";
         } else {
             throw new FridayException("That task number doesn't exist.");
         }

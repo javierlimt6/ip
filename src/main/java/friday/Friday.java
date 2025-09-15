@@ -102,8 +102,7 @@ public class Friday extends Application {
                     storage.save();
                     assert taskList.size() == initialTaskCount + 1
                             : "Task count should increase by 1 after adding todo";
-                    return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
-                            + "\nNow you have " + taskList.size() + " tasks in the list.";
+                    return generateTaskAddedResponse();
                 case "deadline":
                     Parser.DeadlineArgs deadlineArgs = Parser.parseDeadlineArgs(parsed.arguments);
                     assert deadlineArgs != null : "Deadline args should not be null";
@@ -111,8 +110,7 @@ public class Friday extends Application {
                     storage.save();
                     assert taskList.size() == initialTaskCount + 1
                             : "Task count should increase by 1 after adding deadline";
-                    return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
-                            + "\nNow you have " + taskList.size() + " tasks in the list.";
+                    return generateTaskAddedResponse();
                 case "event":
                     Parser.EventArgs eventArgs = Parser.parseEventArgs(parsed.arguments);
                     assert eventArgs != null : "Event args should not be null";
@@ -120,8 +118,7 @@ public class Friday extends Application {
                     storage.save();
                     assert taskList.size() == initialTaskCount + 1
                             : "Task count should increase by 1 after adding event";
-                    return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
-                            + "\nNow you have " + taskList.size() + " tasks in the list.";
+                    return generateTaskAddedResponse();
                 case "delete":
                     int deleteIndex = Parser.parseIndex(parsed.arguments);
                     assert deleteIndex >= 1 : "Delete index should be 1 or greater";
@@ -143,6 +140,22 @@ public class Friday extends Application {
         } catch (FridayException e) {
             return e.getMessage();
         }
+    }
+
+    /**
+     * Generates a standardized response for when a task has been successfully
+     * added.
+     * This method reduces code duplication across todo, deadline, and event
+     * commands.
+     *
+     * @return A formatted response message indicating the task was added.
+     */
+    private String generateTaskAddedResponse() {
+        assert taskList != null : "Task list should be initialized";
+        assert taskList.size() > 0 : "Task list should have at least one task";
+
+        return "Got it. I've added this task:\n  " + taskList.get(taskList.size() - 1).display()
+                + "\nNow you have " + taskList.size() + " tasks in the list.";
     }
 
     /**
