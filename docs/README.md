@@ -1,7 +1,5 @@
 # Friday User Guide
 
-![Friday Logo](https://via.placeholder.com/150x50?text=Friday) <!-- Replace with actual logo if available -->
-
 Welcome to **Friday**, your friendly task management chatbot! Friday helps you organize your tasks, deadlines, and events with a simple and intuitive interface. Whether you're managing your daily to-do list or planning ahead, Friday is here to assist you.
 
 ## Table of Contents
