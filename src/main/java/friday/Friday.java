@@ -17,8 +17,10 @@ import javafx.stage.Stage;
 public class Friday extends Application {
     private Path DATA_DIR;
     private Path DATA_FILE;
+    private Path TAG_FILE;
     private TaskList taskList = new TaskList();
     private Storage storage;
+    private TagManager tagManager;
 
     /**
      * The main entry point of the application.
@@ -89,14 +91,14 @@ public class Friday extends Application {
                     taskList.mark(markIndex);
                     storage.save();
                     return "Nice! I've marked this task as done:\n  "
-                            + taskList.get(markIndex - 1).display();
+                            + taskList.getDisplayWithTags(markIndex - 1);
                 case "unmark":
                     int unmarkIndex = Parser.parseIndex(parsed.arguments);
                     assert unmarkIndex >= 1 : "Unmark index should be 1 or greater";
                     taskList.unmark(unmarkIndex);
                     storage.save();
                     return "OK, I've marked this task as not done yet:\n  "
-                            + taskList.get(unmarkIndex - 1).display();
+                            + taskList.getDisplayWithTags(unmarkIndex - 1);
                 case "todo":
                     taskList.addTodo(parsed.arguments);
                     storage.save();
@@ -133,9 +135,21 @@ public class Friday extends Application {
                     String findResult = taskList.find(parsed.arguments);
                     assert findResult != null : "Find result should not be null";
                     return findResult;
+                case "tag":
+                    Parser.TagArgs tagArgs = Parser.parseTagArgs(parsed.arguments);
+                    assert tagArgs != null : "Tag args should not be null";
+                    taskList.tag(tagArgs.index, tagArgs.tag);
+                    return "Got it! I've tagged this task:\n  "
+                            + taskList.getDisplayWithTags(tagArgs.index - 1);
+                case "untag":
+                    Parser.TagArgs untagArgs = Parser.parseTagArgs(parsed.arguments);
+                    assert untagArgs != null : "Untag args should not be null";
+                    taskList.untag(untagArgs.index, untagArgs.tag);
+                    return "Got it! I've removed the tag from this task:\n  "
+                            + taskList.getDisplayWithTags(untagArgs.index - 1);
                 default:
                     throw new FridayException("I don't recognise that command. Try: todo, deadline, event, " +
-                            "list, mark, unmark, delete, find, bye");
+                            "list, mark, unmark, delete, find, tag, untag, bye");
             }
         } catch (FridayException e) {
             return e.getMessage();
@@ -170,7 +184,10 @@ public class Friday extends Application {
             Ui.printWarning("Could not initialise storage directory: " + e.getMessage());
         }
         DATA_FILE = DATA_DIR.resolve("duke.txt");
+        TAG_FILE = DATA_DIR.resolve("tags.txt");
         storage = new Storage(DATA_FILE, taskList);
+        tagManager = new TagManager(TAG_FILE);
+        taskList.setTagManager(tagManager);
     }
 
     /**

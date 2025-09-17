@@ -9,12 +9,23 @@ import java.time.LocalDate;
  */
 public class TaskList {
     private ArrayList<Task> tasks;
+    private TagManager tagManager;
 
     /**
      * Constructs an empty TaskList.
      */
     public TaskList() {
         this.tasks = new ArrayList<>();
+        this.tagManager = null;
+    }
+
+    /**
+     * Sets the TagManager for this TaskList.
+     *
+     * @param tagManager The TagManager to use for tag operations.
+     */
+    public void setTagManager(TagManager tagManager) {
+        this.tagManager = tagManager;
     }
 
     /**
@@ -141,7 +152,7 @@ public class TaskList {
         StringBuilder sb = new StringBuilder();
         sb.append("Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
-            sb.append(" ").append(i + 1).append(".").append(tasks.get(i).display());
+            sb.append(" ").append(i + 1).append(".").append(getDisplayWithTags(i));
             if (i < tasks.size() - 1) {
                 sb.append("\n");
             }
@@ -210,7 +221,7 @@ public class TaskList {
         for (int i = 0; i < tasks.size(); i++) {
             if (tasks.get(i).getDesc().toLowerCase().contains(keyword.toLowerCase())) {
                 count++;
-                sb.append(" ").append(count).append(".").append(tasks.get(i).display());
+                sb.append(" ").append(count).append(".").append(getDisplayWithTags(i));
                 if (i < tasks.size() - 1) {
                     sb.append("\n");
                 }
@@ -221,5 +232,66 @@ public class TaskList {
             sb.append("No matching tasks found.");
         }
         return sb.toString();
+    }
+
+    /**
+     * Adds a tag to a task at the specified index.
+     *
+     * @param idx The 1-based index of the task to tag.
+     * @param tag The tag to add (without # prefix).
+     * @throws FridayException If the index is out of range or tag is invalid.
+     */
+    public void tag(int idx, String tag) throws FridayException {
+        if (idx < 1 || idx > tasks.size()) {
+            throw new FridayException("That task number doesn't exist.");
+        }
+        if (tag == null || tag.trim().isEmpty()) {
+            throw new FridayException("Please provide a tag to add.");
+        }
+
+        if (tagManager != null) {
+            tagManager.addTag(idx, tag);
+        }
+    }
+
+    /**
+     * Removes a tag from a task at the specified index.
+     *
+     * @param idx The 1-based index of the task to untag.
+     * @param tag The tag to remove (without # prefix).
+     * @throws FridayException If the index is out of range or tag is invalid.
+     */
+    public void untag(int idx, String tag) throws FridayException {
+        if (idx < 1 || idx > tasks.size()) {
+            throw new FridayException("That task number doesn't exist.");
+        }
+        if (tag == null || tag.trim().isEmpty()) {
+            throw new FridayException("Please provide a tag to remove.");
+        }
+
+        if (tagManager != null) {
+            if (!tagManager.hasTag(idx, tag)) {
+                throw new FridayException("Task does not have the tag '" + tag + "'.");
+            }
+            tagManager.removeTag(idx, tag);
+        }
+    }
+
+    /**
+     * Gets the display string for a task including tags.
+     *
+     * @param idx The 0-based index of the task.
+     * @return The display string with tags.
+     */
+    public String getDisplayWithTags(int idx) {
+        Task task = get(idx);
+        String baseDisplay = task.display();
+
+        if (tagManager != null) {
+            String tagString = tagManager.getTagDisplayString(idx + 1); // Convert to 1-based
+            return baseDisplay + tagString;
+        }
+
+        return baseDisplay;
     }
 }

@@ -286,4 +286,53 @@ public class Parser {
             this.to = to;
         }
     }
+
+    /**
+     * Parses tag arguments from the rest string.
+     * Expected format: "index tag" (e.g., "1 fun")
+     * 
+     * @param rest The arguments string (after "tag " or "untag ")
+     * @return A TagArgs object with index and tag
+     * @throws FridayException if parsing fails
+     */
+    public static TagArgs parseTagArgs(String rest) throws FridayException {
+        if (rest == null || rest.trim().isBlank()) {
+            throw new FridayException("Please provide a task number and tag.");
+        }
+
+        String trimmed = rest.trim();
+        int spaceIndex = trimmed.indexOf(' ');
+
+        if (spaceIndex == -1) {
+            throw new FridayException("Please provide both a task number and a tag.");
+        }
+
+        String indexStr = trimmed.substring(0, spaceIndex).trim();
+        String tagStr = trimmed.substring(spaceIndex + 1).trim();
+
+        if (indexStr.isBlank()) {
+            throw new FridayException("Please provide a task number.");
+        }
+        if (tagStr.isBlank()) {
+            throw new FridayException("Please provide a tag.");
+        }
+
+        int index = parseIndex(indexStr);
+        assert index >= 1 : "Parsed index should be 1 or greater";
+
+        return new TagArgs(index, tagStr);
+    }
+
+    /**
+     * Represents parsed arguments for tag operations.
+     */
+    public static class TagArgs {
+        public final int index;
+        public final String tag;
+
+        public TagArgs(int index, String tag) {
+            this.index = index;
+            this.tag = tag;
+        }
+    }
 }
