@@ -10,3 +10,6 @@ T | 0 | test
 E | 1 | make unit tests | 9pm || 11pm
 E | 0 | Meeting | 10am || 12pm
 T | 0 | A-CodeQuality
+T | 0 | study midterms /from tomorrow /to friday!
+T | 0 | study midterms
+E | 0 | study midterms | 1am || 3am
