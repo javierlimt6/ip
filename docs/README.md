@@ -85,7 +85,7 @@ Now you have 3 tasks in the list.
 
 #### List All Tasks
 
-View all your tasks.
+View all your tasks!
 
 **Format**: `list`
 
