@@ -41,7 +41,7 @@ test {
 }
 
 application {
-    mainClass = "friday.Friday"
+    mainClass.set("friday.Launcher")  // Change to Launcher
 }
 
 shadowJar {
